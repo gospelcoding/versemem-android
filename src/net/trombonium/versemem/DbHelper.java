@@ -3,6 +3,8 @@ package net.trombonium.versemem;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -10,13 +12,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class DbHelper extends SQLiteOpenHelper {
-	public static final int VERSION = 1;
-	public static final String DB_NAME = "versemem.db";
+public class DbHelper extends SQLiteAssetHelper {
+	public static final int DATABASE_VERSION = 2;
+	public static final String DATABASE_NAME = "versemem.db";
 	public static final String TAG = "DbHelper";
 	
 	public DbHelper(Context context){
-		super(context, DB_NAME, null, VERSION);
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 	
 	public Cursor getVersesCursor(){
@@ -72,6 +74,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		return verses;
 	}
 
+	/*
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		//String version_table_sql = "CREATE TABLE version(version INTEGER)";
@@ -106,4 +109,5 @@ public class DbHelper extends SQLiteOpenHelper {
 		}
 		
 	}
+	*/
 }

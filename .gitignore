@@ -31,3 +31,4 @@ proguard/
 #versemem
 kjv
 kjv.zip
+.DS_Store
