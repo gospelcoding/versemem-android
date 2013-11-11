@@ -17,10 +17,12 @@ public class DbHelper extends SQLiteAssetHelper {
 	public static final String DATABASE_NAME = "versemem.db";
 	public static final String TAG = "DbHelper";
 	
-	public static final String BOOKS_TABLE = "books";
-	public static final String BOOKS_ID_COLUMN = "_id";
-	public static final String BOOKS_NAME_COLUMN = "name";
-	public static final String BOOKS_TRANSLATION_ID_COLUMN = "translation_id";
+	public static final String CHAPTER_NUMS_TABLE = "chapternums";
+	public static final String BOOK_ID_COLUMN = "book_id";
+	public static final String NUMBER_OF_CHAPTERS_COLUMN = "number_of_chapters";
+	public static final String VERSE_NUMS_TABLE = "versenums";
+	public static final String CHAPTER_COLUMN = "chapter";
+	public static final String NUMBER_OF_VERSES_COLUMN = "number_of_verses";
 	
 	public DbHelper(Context context){
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -79,17 +81,37 @@ public class DbHelper extends SQLiteAssetHelper {
 		return verses;
 	}
 	
-	public List<String> getAllBooks(int translation_id){
+	public List<Book> getAllBooks(int translation_id){
 		SQLiteDatabase db = getReadableDatabase();
-		List<String> books = new ArrayList<String>();
-		Cursor c = db.query(BOOKS_TABLE, new String[]{BOOKS_NAME_COLUMN}, BOOKS_TRANSLATION_ID_COLUMN+"="+translation_id, null, null, null, BOOKS_ID_COLUMN, null);
+		List<Book> books = new ArrayList<Book>();
+		Cursor c = db.query(Book.BOOKS_TABLE, new String[]{Book.ID_COLUMN, Book.NAME_COLUMN}, Book.TRANSLATION_ID_COLUMN+"="+translation_id, null, null, null, Book.ID_COLUMN, null);
 		c.moveToFirst();
 		while(!c.isAfterLast()){
-			books.add(c.getString(0));
+			int id = c.getInt(0);
+			String name = c.getString(1);
+			books.add(new Book(id, name));
 			c.moveToNext();
 		}
 		c.close();
 		return books;
+	}
+	
+	public int getNumberOfChapters(int bookId){
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor c = db.query(CHAPTER_NUMS_TABLE, new String[]{NUMBER_OF_CHAPTERS_COLUMN}, BOOK_ID_COLUMN+"="+bookId, null, null, null, null, "1");
+		c.moveToFirst();
+		int chapters = c.getInt(0);
+		c.close();
+		return chapters;
+	}
+	
+	public int getNumberOfVerses(int bookId, int chapter){
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor c = db.query(VERSE_NUMS_TABLE, new String[]{NUMBER_OF_VERSES_COLUMN}, BOOK_ID_COLUMN+"="+bookId+" and "+CHAPTER_COLUMN+"="+chapter, null, null, null, null, "1");
+		c.moveToFirst();
+		int verses = c.getInt(0);
+		c.close();
+		return verses;
 	}
 
 	/*
