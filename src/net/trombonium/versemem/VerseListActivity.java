@@ -57,6 +57,7 @@ public class VerseListActivity extends ListActivity {
 	
 	public void getNewVerse(){
 		Intent intent = new Intent(this, NewVerseActivity.class);
+		startActivity(intent);
 	}
 	
 	@Override

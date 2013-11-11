@@ -17,6 +17,11 @@ public class DbHelper extends SQLiteAssetHelper {
 	public static final String DATABASE_NAME = "versemem.db";
 	public static final String TAG = "DbHelper";
 	
+	public static final String BOOKS_TABLE = "books";
+	public static final String BOOKS_ID_COLUMN = "_id";
+	public static final String BOOKS_NAME_COLUMN = "name";
+	public static final String BOOKS_TRANSLATION_ID_COLUMN = "translation_id";
+	
 	public DbHelper(Context context){
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -72,6 +77,19 @@ public class DbHelper extends SQLiteAssetHelper {
 		}
 		cursor.close();
 		return verses;
+	}
+	
+	public List<String> getAllBooks(int translation_id){
+		SQLiteDatabase db = getReadableDatabase();
+		List<String> books = new ArrayList<String>();
+		Cursor c = db.query(BOOKS_TABLE, new String[]{BOOKS_NAME_COLUMN}, BOOKS_TRANSLATION_ID_COLUMN+"="+translation_id, null, null, null, BOOKS_ID_COLUMN, null);
+		c.moveToFirst();
+		while(!c.isAfterLast()){
+			books.add(c.getString(0));
+			c.moveToNext();
+		}
+		c.close();
+		return books;
 	}
 
 	/*

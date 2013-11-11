@@ -1,9 +1,13 @@
 package net.trombonium.versemem;
 
+import java.util.List;
+
 import android.os.Bundle;
 import android.app.Activity;
+import android.database.Cursor;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.Spinner;
 
 public class NewVerseActivity extends Activity {
@@ -14,12 +18,10 @@ public class NewVerseActivity extends Activity {
 		setContentView(R.layout.activity_new_verse);
 		
 		Spinner spinner = (Spinner) findViewById(R.id.books_spinner);
-		// Create an ArrayAdapter using the string array and a default spinner layout
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-		        R.array.books_array, android.R.layout.simple_spinner_item);
-		// Specify the layout to use when the list of choices appears
+		DbHelper dbhelper = new DbHelper(this);
+		List<String> books = dbhelper.getAllBooks(1);  /* TODO - make this translation id come from somewhere */
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, books);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		// Apply the adapter to the spinner
 		spinner.setAdapter(adapter);
 	}
 
@@ -30,4 +32,6 @@ public class NewVerseActivity extends Activity {
 		return true;
 	}
 
+	
+	
 }
