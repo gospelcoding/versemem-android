@@ -16,6 +16,9 @@ public class Book {
 	}
 	
 	public String getName(){ return name; }
+	public String getWebName(){
+		return name.replace(" ", "-");
+	}
 	public int getId(){ return id; }
 	public String toString(){ return name; }
 }

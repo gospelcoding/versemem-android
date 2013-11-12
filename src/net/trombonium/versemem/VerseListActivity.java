@@ -31,7 +31,10 @@ public class VerseListActivity extends ListActivity {
 //		setListAdapter(adapter);
 		List<Verse> verses = dbhelper.getAllVerses();
 		ArrayAdapter<Verse> adapter = new ArrayAdapter<Verse>(this, android.R.layout.simple_list_item_1, verses);
-		setListAdapter(adapter);		
+		setListAdapter(adapter);	
+		if(verses.size() == 0){
+			getNewVerse();
+		}
 	}
 			
 	@Override
