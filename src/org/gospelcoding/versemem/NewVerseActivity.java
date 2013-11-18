@@ -1,4 +1,4 @@
-package net.trombonium.versemem;
+package org.gospelcoding.versemem;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -9,6 +9,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import org.gospelcoding.versemem.R;
 
 import android.os.AsyncTask;
 import android.os.Bundle;

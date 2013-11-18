@@ -1,7 +1,10 @@
-package net.trombonium.versemem;
+package org.gospelcoding.versemem;
 
+import org.gospelcoding.versemem.R;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
@@ -10,7 +13,6 @@ import android.widget.TextView;
 
 public class QuizActivity extends Activity {
 	
-	public final static String QUIZ_RESULT = "net.trombonium.versemem.quiz_result";
 	private Verse quizVerse;
 
 	@Override
@@ -46,7 +48,11 @@ public class QuizActivity extends Activity {
 			resultText.setText("Sorry :(");
 		}
 
-		quizVerse.saveQuizResult(result, new DbHelper(this));
+		DbHelper dbhelper = new DbHelper(this);
+		quizVerse.saveQuizResult(result, dbhelper);
+		int attemptId = dbhelper.getNextAttemptId() - 1;
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel(attemptId);
 	}
 	
 	public void submitQuiz(View view){

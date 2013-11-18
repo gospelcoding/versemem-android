@@ -1,4 +1,4 @@
-package net.trombonium.versemem;
+package org.gospelcoding.versemem;
 
 public class Book {
 

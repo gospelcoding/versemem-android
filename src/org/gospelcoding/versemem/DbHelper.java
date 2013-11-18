@@ -1,4 +1,4 @@
-package net.trombonium.versemem;
+package org.gospelcoding.versemem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +112,16 @@ public class DbHelper extends SQLiteAssetHelper {
 		int verses = c.getInt(0);
 		c.close();
 		return verses;
+	}
+	
+	public int getNextAttemptId(){
+		//attempt id's start at 0 and increment for each attempt on any verse
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor c = db.query(Verse.VERSES_TABLE, new String[]{"SUM("+Verse.ATTEMPTS_COLUMN+")"}, null, null, null, null, null, null);
+		c.moveToFirst();
+		int attemptId = c.getInt(0);
+		c.close();
+		return attemptId;
 	}
 
 	/*

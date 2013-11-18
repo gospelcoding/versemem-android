@@ -1,13 +1,24 @@
-package net.trombonium.versemem;
+package org.gospelcoding.versemem;
 
 import java.util.List;
 
+import org.gospelcoding.versemem.R;
+import org.joda.time.Chronology;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
+
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.ListActivity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.database.Cursor;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,9 +96,12 @@ public class VerseListActivity extends ListActivity {
 	}
 	
 	private void tempCode(){
-		DbHelper dbhelper = new DbHelper(this);
-		Verse v = new Verse("John 11:35", "Jesus wept.");
-		v.insertVerse(dbhelper);
+		AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+		DateTime now = DateTime.now();
+		DateTime alarm = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 14, 10);
+		long oneDayInMillis = 1 * 24 * 60 * 60 * 1000;
+		PendingIntent notifyPendingIntent = PendingIntent.getService(this, 0, new Intent(this, QuizNotificationService.class), 0);
+		mAlarmManager.setRepeating(AlarmManager.RTC, alarm.getMillis(), oneDayInMillis, notifyPendingIntent);
 	}
 
 }

@@ -1,4 +1,4 @@
-package net.trombonium.versemem;
+package org.gospelcoding.versemem;
 
 import java.util.HashMap;
 import java.util.List;
@@ -112,7 +112,10 @@ public class Verse {
 		int id = DbHelper.getCursorInt(cursor, ID_COLUMN);
 		Cursor cursor2 = db.query(VERSES_TABLE, null, getIdWhereClause(id), null, null, null, null, null);
 		cursor2.moveToFirst();
-		return new Verse(cursor2);
+		Verse v = new Verse(cursor2);
+		cursor.close();
+		cursor2.close();
+		return v;
 	}
 	
 	public boolean checkAttempt(String attempt){
@@ -266,6 +269,7 @@ public class Verse {
 				vCursor.moveToNext();
 			}
 		}
+		vCursor.close();
 	}
 	
  	public static LocalDate lastAttemptFromString(String s){

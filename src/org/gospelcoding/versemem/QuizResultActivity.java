@@ -1,5 +1,6 @@
-package net.trombonium.versemem;
+package org.gospelcoding.versemem;
 
+import org.gospelcoding.versemem.R;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;

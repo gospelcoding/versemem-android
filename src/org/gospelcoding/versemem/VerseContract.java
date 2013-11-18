@@ -1,3 +1,4 @@
+package org.gospelcoding.versemem;
 //package net.trombonium.versemem;
 //
 //import android.provider.BaseColumns;
