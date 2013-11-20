@@ -69,8 +69,9 @@ public class DbHelper extends SQLiteAssetHelper {
 //	}
 	
 	public List<Verse> getAllVerses(){
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cursor = db.query(Verse.VERSES_TABLE, null, null, null, null, null, Verse.ID_COLUMN, null);
 		List<Verse> verses = new ArrayList<Verse>();
-		Cursor cursor = getVersesCursor();
 		cursor.moveToFirst();
 		while(!cursor.isAfterLast()){
 			Verse v = new Verse(cursor);
@@ -78,6 +79,7 @@ public class DbHelper extends SQLiteAssetHelper {
 			cursor.moveToNext();
 		}
 		cursor.close();
+		db.close();
 		return verses;
 	}
 	

@@ -90,6 +90,9 @@ public class VerseListActivity extends ListActivity {
 		case R.id.action_new_verse:
 			getNewVerse();
 			return true;
+		case R.id.action_settings:
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);	
 		}

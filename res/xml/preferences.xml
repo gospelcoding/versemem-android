@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+   
+    <ListPreference
+        android:key="pref_translation"
+        android:title="@string/pref_translation"
+        android:entries="@array/pref_translations"
+        android:entryValues="@array/pref_translations"
+        android:defaultValue="@string/pref_translation_default" />
+    <CheckBoxPreference
+        android:key="pref_auto_merge"
+        android:title="@string/pref_auto_merge"
+        android:defaultValue="true" />
+        
+    Translation/Language - Drop down box
+    Notifications per Day - Drop down box 1-5
+    	Time of Notifications - Time Preference
+    	Vibrate on Notification
+    	LED on Notification
+    Practice Checker - Drop down box
+    Auto Merge Verses
+
+</PreferenceScreen>
