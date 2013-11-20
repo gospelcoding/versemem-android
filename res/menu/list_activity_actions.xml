@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/action_quiz" 
+        android:title="@string/action_quiz"
+        android:icon="@drawable/ic_action_play"
+        android:showAsAction="ifRoom" />
+    <item android:id="@+id/action_new_verse"
+        android:title="@string/action_new_verse"
+        android:icon="@drawable/ic_action_new"
+        android:showAsAction="ifRoom" />
+</menu>
