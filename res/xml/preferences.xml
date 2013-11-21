@@ -5,19 +5,30 @@
         android:key="pref_translation"
         android:title="@string/pref_translation"
         android:entries="@array/pref_translations"
-        android:entryValues="@array/pref_translations"
+        android:entryValues="@array/pref_translation_values"
         android:defaultValue="@string/pref_translation_default" />
+    <ListPreference 
+        android:key="pref_notification_number"
+        android:title="@string/pref_notification_number"
+        android:entries="@array/pref_notification_numbers"
+        android:entryValues="@array/pref_notification_numbers"
+        android:defaultValue="@string/pref_notification_number_default" />
+    <CheckBoxPreference 
+        android:key="pref_notification_vibrate"
+        android:title="@string/pref_notification_vibrate"
+        android:defaultValue="false"/>
+    <CheckBoxPreference 
+        android:key="pref_notification_led"
+        android:title="@string/pref_notification_led"
+        android:defaultValue="false"/>
+    <ListPreference 
+        android:key="pref_quiz_style"
+        android:title="@string/pref_quiz_style"
+        android:entries="@array/pref_quiz_styles"
+        android:entryValues="@array/pref_quiz_styles"
+        android:defaultValue="@string/pref_quiz_style_default" />
     <CheckBoxPreference
         android:key="pref_auto_merge"
         android:title="@string/pref_auto_merge"
-        android:defaultValue="true" />
-        
-    Translation/Language - Drop down box
-    Notifications per Day - Drop down box 1-5
-    	Time of Notifications - Time Preference
-    	Vibrate on Notification
-    	LED on Notification
-    Practice Checker - Drop down box
-    Auto Merge Verses
-
+        android:defaultValue="false" />
 </PreferenceScreen>

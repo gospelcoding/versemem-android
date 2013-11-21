@@ -14,8 +14,10 @@ import org.gospelcoding.versemem.R;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.util.Log;
 import android.view.Menu;
@@ -98,9 +100,16 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		return true;
 	}
 	
+	public String getTranslation(){
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String translation = prefs.getString("pref_translation", "");
+		return translation;
+	}
+	
 	public void getNewVerse(View v){
 		//runs when new verse button is clicked
-		String urlString = "http://gospelcoding.org/bible/kjv/"; /* TODO put a real translation in here */
+		String urlString = "http://gospelcoding.org/bible/"; /* TODO put a real translation in here */
+		urlString += getTranslation() + "/";
 		urlString += currentBook.getWebName() + "-" + currentChapter + "-" + currentVerse;
 		try {
 			URL url = new URL(urlString);
@@ -125,9 +134,8 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 				verseBody = new Scanner(in, "UTF-8").useDelimiter("\\A").next();
 				return verseBody;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-				return "";
+				return "Sorry, that verse could not be found. (Do you have an internet connection?)";
 			}
 		}
 		

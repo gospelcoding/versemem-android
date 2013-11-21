@@ -11,14 +11,36 @@
     <string name="title_activity_new_verse">NewVerseActivity</string>
     <string name="get_verse_button">Get Verse</string>
     <string name="add_verse_button">Add Verse</string>
+    
     <string name="pref_translation">Translation</string>
     <string name="pref_translation_default">King James Version</string>
-
+    <string-array name="pref_translation_values">
+        <item>kjv</item>
+        <item>esv</item>
+    </string-array>
     <string-array name="pref_translations">
         <item>King James Version</item>
         <item>English Standard Version</item>
     </string-array>
-
+	<string name="pref_notification_number">Daily Notifications</string>
+	<string name="pref_notification_number_default">2</string>
+	<string-array name="pref_notification_numbers">
+	    <item>1</item>
+	    <item>2</item>
+	    <item>3</item>
+	    <item>4</item>
+	    <item>5</item>
+	</string-array>
+	<string name="pref_notification_vibrate">Vibrate on Notifications</string>
+	<string name="pref_notification_led">LED on Notifications</string>
+	<string name="pref_quiz_style">Practice Checker</string>
+	<string name="pref_quiz_style_default">Keyboard Auto-Check</string>
+	<string-array name="pref_quiz_styles">
+	    <item>Keyboard Auto-Check</item>
+	    <item>Keyboard Self-Check</item>
+	    <item>Microphone Self-Check</item>
+	    <item>No Input</item>
+	</string-array>
     <string name="pref_auto_merge">Automatically Combine Adjacent Verses</string>
     <string name="title_activity_settings">Settings</string>
 

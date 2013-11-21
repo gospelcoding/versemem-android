@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.ListActivity;
@@ -51,6 +52,7 @@ public class VerseListActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		//setContentView(R.layout.activity_list);
 		
 		showList();
