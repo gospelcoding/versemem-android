@@ -54,15 +54,13 @@ public class VerseListActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		//setContentView(R.layout.activity_list);
-		
-		showList();
+		//showList();
 		//tempCode();
 	}
 	
 	@Override
 	protected void onStart(){
 		super.onStart();
-		
 		showList();
 	}
 

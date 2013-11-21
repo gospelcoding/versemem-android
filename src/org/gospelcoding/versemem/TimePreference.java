@@ -25,6 +25,7 @@ public class TimePreference extends DialogPreference {
 
         return(Integer.parseInt(pieces[1]));
     }
+    
 
     public TimePreference(Context ctxt, AttributeSet attrs) {
         super(ctxt, attrs);

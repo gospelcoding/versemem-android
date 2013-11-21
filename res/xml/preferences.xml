@@ -27,8 +27,8 @@
         android:entries="@array/pref_quiz_styles"
         android:entryValues="@array/pref_quiz_styles"
         android:defaultValue="@string/pref_quiz_style_default" />
-    <CheckBoxPreference
-        android:key="pref_auto_merge"
-        android:title="@string/pref_auto_merge"
-        android:defaultValue="false" />
+<!--     <CheckBoxPreference -->
+<!--         android:key="pref_auto_merge" -->
+<!--         android:title="@string/pref_auto_merge" -->
+<!--         android:defaultValue="false" /> -->
 </PreferenceScreen>
