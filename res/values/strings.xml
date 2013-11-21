@@ -13,7 +13,7 @@
     <string name="add_verse_button">Add Verse</string>
     
     <string name="pref_translation">Translation</string>
-    <string name="pref_translation_default">King James Version</string>
+    <string name="pref_translation_default">kjv</string>
     <string-array name="pref_translation_values">
         <item>kjv</item>
         <item>esv</item>
