@@ -95,6 +95,7 @@ public class DbHelper extends SQLiteAssetHelper {
 			c.moveToNext();
 		}
 		c.close();
+		db.close();
 		return books;
 	}
 	
@@ -104,6 +105,7 @@ public class DbHelper extends SQLiteAssetHelper {
 		c.moveToFirst();
 		int chapters = c.getInt(0);
 		c.close();
+		db.close();
 		return chapters;
 	}
 	
@@ -113,6 +115,7 @@ public class DbHelper extends SQLiteAssetHelper {
 		c.moveToFirst();
 		int verses = c.getInt(0);
 		c.close();
+		db.close();
 		return verses;
 	}
 	

@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 public class QuizNotificationService extends IntentService {
 
@@ -15,10 +16,11 @@ public class QuizNotificationService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		notifyQuiz();
+		notifyQuiz(intent);
 	}
 
-	public void notifyQuiz(){
+	public void notifyQuiz(Intent intent){
+		Log.e("NotificationService", "notifyQuiz");
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
 		.setSmallIcon(R.drawable.ic_launcher)
 		.setContentTitle("Verse Mem")
@@ -39,7 +41,9 @@ public class QuizNotificationService extends IntentService {
 		NotificationManager mNotificationManager =
 				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		DbHelper dbhelper = new DbHelper(this);
-		int attemptId = dbhelper.getNextAttemptId();
+		int attemptId = intent.getIntExtra("Index", 0);
 		mNotificationManager.notify(attemptId, builder.build());
+		
+		QuizMaster.setNextAlarm(this);
 	}
 }

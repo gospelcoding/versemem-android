@@ -115,6 +115,7 @@ public class Verse {
 		Verse v = new Verse(cursor2);
 		cursor.close();
 		cursor2.close();
+		db.close();
 		return v;
 	}
 	
@@ -193,6 +194,7 @@ public class Verse {
 		ContentValues values = makeContentValues();
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		db.update(VERSES_TABLE, values, getIdWhereClause(id), null);
+		db.close();
 		
 		Verse.weighterMax(dbhelper);
 	}
