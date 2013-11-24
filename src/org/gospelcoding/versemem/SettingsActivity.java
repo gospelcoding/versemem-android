@@ -24,6 +24,14 @@ public class SettingsActivity extends PreferenceActivity
 	public static final String PREF_NOTIFICATION_TIME = "pref_notification_time_";
 	public static final String PREF_NOTIFICATION_VIBRATE = "pref_notification_vibrate";
 	public static final String PREF_NOTIFICATION_LED = "pref_notification_led";
+	public static final String PREF_TRANSLATION = "pref_translation";
+	public static final String DEFAULT_TRANSLATION = "kjv";
+	public static final String PREF_QUIZ_STYLE = "pref_quiz_style";
+	public static final String KEYBOARD_AUTO = "Keyboard Auto-Check";
+	public static final String KEYBOARD_SELF= "Keyboard Self-Check";
+	public static final String MICROPHONE = "Microphone Self-Check";
+	public static final String NO_INPUT = "No Input";
+	public static final String DEFAULT_QUIZ_STYLE = KEYBOARD_AUTO; 
 	private int oldNumberOfNotifications;
 
 	@SuppressWarnings("deprecation")

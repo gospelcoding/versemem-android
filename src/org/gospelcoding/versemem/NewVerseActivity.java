@@ -102,7 +102,7 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 	
 	public String getTranslation(){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		String translation = prefs.getString("pref_translation", "");
+		String translation = prefs.getString(SettingsActivity.PREF_TRANSLATION, SettingsActivity.DEFAULT_TRANSLATION);
 		return translation;
 	}
 	

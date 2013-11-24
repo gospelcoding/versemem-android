@@ -2,25 +2,30 @@ package org.gospelcoding.versemem;
 
 import org.gospelcoding.versemem.R;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class QuizActivity extends Activity {
+public class QuizActivity extends Activity{
 	
 	private Verse quizVerse;
+	private String quizStyle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_quiz);
-		quizVerse = Verse.getQuizVerse(new DbHelper(this));
-		displayQuiz(quizVerse.getReference());
+		displayQuiz();
 	}
 	
 
@@ -32,34 +37,53 @@ public class QuizActivity extends Activity {
 	}
 
 	
-	private void displayQuiz(String reference){
-		TextView quizText = (TextView) findViewById(R.id.quiz_text);
-		quizText.setText(reference);
-	}
-	
-	public void showResult(boolean result){
-		setContentView(R.layout.activity_quiz_result);
-		
-		TextView resultText = (TextView) findViewById(R.id.quiz_result_text);
-		if(result){
-			resultText.setText("Good");
+	private void displayQuiz(){
+		long requizId = getIntent().getLongExtra(QuizResultActivity.VERSE_ID, -1);
+		if(requizId > 0){
+			quizVerse = Verse.getQuizVerse(new DbHelper(this), requizId);
 		}
 		else{
-			resultText.setText("Sorry :(");
+			quizVerse = Verse.getQuizVerse(new DbHelper(this));
 		}
-
-		DbHelper dbhelper = new DbHelper(this);
-		quizVerse.saveQuizResult(result, dbhelper);
-		int attemptId = dbhelper.getNextAttemptId() - 1;
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancel(attemptId);
+		quizStyle = PreferenceManager.getDefaultSharedPreferences(this)
+				.getString(SettingsActivity.PREF_QUIZ_STYLE, SettingsActivity.DEFAULT_QUIZ_STYLE);
+		
+		if(quizStyle.equals(SettingsActivity.KEYBOARD_AUTO) || quizStyle.equals(SettingsActivity.KEYBOARD_SELF)){
+			displayQuizKeyboard();
+		}
+		else if(quizStyle.equals(SettingsActivity.MICROPHONE)){
+			
+		}
+		else if(quizStyle.equals(SettingsActivity.NO_INPUT)){
+			
+		}
+		else{
+			Log.e("QuizActivity", "Unknown quiz type: "+quizStyle);
+		}
 	}
 	
-	public void submitQuiz(View view){
+	public void displayQuizKeyboard(){
+		setContentView(R.layout.quiz_keyboard);
+		String reference = quizVerse.getReference();
+		TextView quizText = (TextView) findViewById(R.id.quiz_text);
+		quizText.setText(reference);
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+	}
+	
+	public void submitQuizKeyboard(View view){
 		EditText quizAttempt = (EditText) findViewById(R.id.quiz_attempt);
 		String attempt = quizAttempt.getText().toString();
-		boolean result = quizVerse.checkAttempt(attempt);
-		showResult(result);
-		
+		Intent intent = new Intent(this, QuizResultActivity.class);
+		intent.putExtra(QuizResultActivity.ATTEMPT, attempt);
+		intent.putExtra(QuizResultActivity.REFERENCE, quizVerse.getReference());
+		intent.putExtra(QuizResultActivity.VERSE_BODY, quizVerse.getBody());
+		intent.putExtra(QuizResultActivity.QUIZ_STYLE, quizStyle);
+		intent.putExtra(QuizResultActivity.VERSE_ID, quizVerse.getId());
+		if(quizStyle.equals(SettingsActivity.KEYBOARD_AUTO)){
+			boolean result = quizVerse.checkAttempt(attempt);
+			intent.putExtra(QuizResultActivity.SUCCESS, result);
+		}
+		startActivity(intent);
+		finish();
 	}
 }

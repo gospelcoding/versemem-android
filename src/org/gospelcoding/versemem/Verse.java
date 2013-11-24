@@ -97,6 +97,20 @@ public class Verse {
 		return verseId;
 	}
 	
+	public static Verse getVerse(DbHelper dbhelper, long id){
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		Cursor c = db.query(VERSES_TABLE, null, getIdWhereClause(id), null, null, null, null, null);
+		c.moveToFirst();
+		Verse v = new Verse(c);
+		c.close();
+		db.close();
+		return v;
+	}
+	
+	public static Verse getQuizVerse(DbHelper dbhelper, long id){
+		return getVerse(dbhelper, id);
+	}
+	
 	public static Verse getQuizVerse(DbHelper dbhelper){
 		SQLiteDatabase db = dbhelper.getReadableDatabase();
 		String[] columns = new String[] {ID_COLUMN, WEIGHT_COLUMN};
@@ -109,14 +123,10 @@ public class Verse {
 			double w = DbHelper.getCursorDouble(cursor, WEIGHT_COLUMN);
 			sum += w;
 		}
-		int id = DbHelper.getCursorInt(cursor, ID_COLUMN);
-		Cursor cursor2 = db.query(VERSES_TABLE, null, getIdWhereClause(id), null, null, null, null, null);
-		cursor2.moveToFirst();
-		Verse v = new Verse(cursor2);
+		long id = DbHelper.getCursorInt(cursor, ID_COLUMN);
 		cursor.close();
-		cursor2.close();
 		db.close();
-		return v;
+		return getVerse(dbhelper, id);
 	}
 	
 	public boolean checkAttempt(String attempt){
@@ -147,6 +157,10 @@ public class Verse {
 			return false;
 		
 		return true;
+	}
+	public static void saveQuizResult(DbHelper dbhelper, long verseId, boolean success){
+		Verse v = getVerse(dbhelper, verseId);
+		v.saveQuizResult(success, dbhelper);
 	}
 	
 	public void saveQuizResult(boolean success, DbHelper dbhelper){
@@ -272,6 +286,7 @@ public class Verse {
 			}
 		}
 		vCursor.close();
+		db.close();
 	}
 	
  	public static LocalDate lastAttemptFromString(String s){

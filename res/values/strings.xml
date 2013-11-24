@@ -2,18 +2,26 @@
 <resources>
 
     <string name="app_name">Verse Mem</string>
-    <string name="action_settings">Settings</string>
     <string name="action_quiz">Quiz</string>
-    <string name="action_new_verse">New Verse</string>
     <string name="title_activity_quiz">QuizActivity</string>
     <string name="submit_quiz_button">Submit</string>
-    <string name="title_activity_quiz_result">QuizResultActivity</string>
+    <string name="quiz_success">Good!!</string>
+    <string name="quiz_failure_auto">Not quite. Would you like to try again?</string>
+    <string name="quiz_failure_manual">Sorry. Would you like to try again?</string>
+    <string name="action_new_verse">New Verse</string>
     <string name="title_activity_new_verse">NewVerseActivity</string>
     <string name="get_verse_button">Get Verse</string>
     <string name="add_verse_button">Add Verse</string>
-    
+    <string name="action_settings">Settings</string>
     <string name="pref_translation">Translation</string>
     <string name="pref_translation_default">kjv</string>
+    <string name="user_answer">You put:</string>
+    <string name="right_button">Right</string>
+    <string name="wrong_button">Wrong</string>
+    <string name="new_quiz_button">Practice Another</string>
+    <string name="requiz_button">Try Again</string>
+    <string name="go_to_list_button">Verse List</string>
+
     <string-array name="pref_translation_values">
         <item>kjv</item>
         <item>esv</item>
@@ -22,27 +30,34 @@
         <item>King James Version</item>
         <item>English Standard Version</item>
     </string-array>
-	<string name="pref_notification_number">Daily Notifications</string>
-	<string name="pref_notification_number_default">2</string>
-	<string-array name="pref_notification_numbers">
-	    <item>1</item>
-	    <item>2</item>
-	    <item>3</item>
-	    <item>4</item>
-	    <item>5</item>
-	</string-array>
-	<string name="pref_notification_time">Notification Time</string>
-	<string name="pref_notification_vibrate">Vibrate on Notifications</string>
-	<string name="pref_notification_led">LED on Notifications</string>
-	<string name="pref_quiz_style">Practice Checker</string>
-	<string name="pref_quiz_style_default">Keyboard Auto-Check</string>
-	<string-array name="pref_quiz_styles">
-	    <item>Keyboard Auto-Check</item>
-	    <item>Keyboard Self-Check</item>
-	    <item>Microphone Self-Check</item>
-	    <item>No Input</item>
-	</string-array>
+
+    <string name="pref_notification_number">Daily Notifications</string>
+    <string name="pref_notification_number_default">2</string>
+
+    <string-array name="pref_notification_numbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <string name="pref_notification_time">Notification Time</string>
+    <string name="pref_notification_vibrate">Vibrate on Notifications</string>
+    <string name="pref_notification_led">LED on Notifications</string>
+    <string name="pref_quiz_style">Practice Checker</string>
+    <string name="pref_quiz_style_default">Keyboard Auto-Check</string>
+
+    <string-array name="pref_quiz_styles">
+        <item>Keyboard Auto-Check</item>
+        <item>Keyboard Self-Check</item>
+        <item>Microphone Self-Check</item>
+        <item>No Input</item>
+    </string-array>
+
     <string name="pref_auto_merge">Automatically Combine Adjacent Verses</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_quiz_result">QuizResultActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
