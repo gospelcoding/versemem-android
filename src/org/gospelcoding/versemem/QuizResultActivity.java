@@ -1,6 +1,7 @@
 package org.gospelcoding.versemem;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -58,7 +59,7 @@ public class QuizResultActivity extends Activity {
 			
 		}
 		else if(quizStyle.equals(SettingsActivity.NO_INPUT)){
-			
+			showQuizNoInput();
 		}
 		else{
 			Log.e("QuizResultActivity", "Unknown quiz type: "+quizStyle);
@@ -91,6 +92,33 @@ public class QuizResultActivity extends Activity {
 		rightAnswerText.setText(reference + "\n\n" + verseBody);
 		TextView userAnswerText = (TextView) findViewById(R.id.user_answer_text);
 		userAnswerText.setText(getString(R.string.user_answer) + "\n\n" + attempt);
+	}
+	
+	public void showQuizNoInput(){
+		setContentView(R.layout.quiz_result_no_input);
+		String reference = getIntent().getStringExtra(REFERENCE);
+		((TextView) findViewById(R.id.quiz_text)).setText(reference);
+	}
+	
+	public void showAnswerNoInput(View v){
+		TextView answerView = (TextView) findViewById(R.id.right_answer_text);
+		String verseBody = getIntent().getStringExtra(VERSE_BODY);
+		answerView.setText(verseBody);
+		findViewById(R.id.button_right).setVisibility(View.VISIBLE);
+		findViewById(R.id.button_wrong).setVisibility(View.VISIBLE);
+//		String[] verseArray = verseBody.split("\\s+");
+//		String currentAnswer = verseArray[0];
+//		answerView.setText(currentAnswer);
+//		for(int i=1; i<verseArray.length; ++i){
+//			try {
+//				Thread.sleep(300);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			currentAnswer += " " + verseArray[i];
+//			answerView.setText(currentAnswer);
+//		}
 	}
 	
 	public void showResult(View v){

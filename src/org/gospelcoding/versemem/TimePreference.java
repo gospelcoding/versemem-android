@@ -94,6 +94,7 @@ public class TimePreference extends DialogPreference {
     private static final int TIME_PICKER_INTERVAL=15;
     private boolean mIgnoreEvent=false;
 
+    /*Time Picker with 15 minute intervals by Mark Horgan */
     private TimePicker.OnTimeChangedListener mTimePickerListener=new TimePicker.OnTimeChangedListener(){
         public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute){
             if (mIgnoreEvent)

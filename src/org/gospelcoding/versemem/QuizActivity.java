@@ -55,7 +55,7 @@ public class QuizActivity extends Activity{
 			
 		}
 		else if(quizStyle.equals(SettingsActivity.NO_INPUT)){
-			
+			submitQuizNoInput();
 		}
 		else{
 			Log.e("QuizActivity", "Unknown quiz type: "+quizStyle);
@@ -68,6 +68,16 @@ public class QuizActivity extends Activity{
 		TextView quizText = (TextView) findViewById(R.id.quiz_text);
 		quizText.setText(reference);
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+	}
+	
+	public void submitQuizNoInput(){
+		Intent intent = new Intent(this, QuizResultActivity.class);
+		intent.putExtra(QuizResultActivity.REFERENCE, quizVerse.getReference());
+		intent.putExtra(QuizResultActivity.VERSE_BODY, quizVerse.getBody());
+		intent.putExtra(QuizResultActivity.QUIZ_STYLE, quizStyle);
+		intent.putExtra(QuizResultActivity.VERSE_ID, quizVerse.getId());
+		startActivity(intent);
+		finish();
 	}
 	
 	public void submitQuizKeyboard(View view){

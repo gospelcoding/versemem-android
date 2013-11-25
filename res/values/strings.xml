@@ -16,6 +16,7 @@
     <string name="pref_translation">Translation</string>
     <string name="pref_translation_default">kjv</string>
     <string name="user_answer">You put:</string>
+    <string name="show_answer_button">Show Answer</string>
     <string name="right_button">Right</string>
     <string name="wrong_button">Wrong</string>
     <string name="new_quiz_button">Practice Another</string>
