@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -20,9 +21,17 @@ public class QuizResultActivity extends Activity {
 	public static final String QUIZ_STYLE = "org.gospelcoding.versemem.quiz_style";
 	public static final String VERSE_ID = "org.gospelcoding.versemem.verse_id";
 	public static final String REFERENCE = "org.gospelcoding.versemem.reference";
+	public static final String QUIZ_ID = "org.gospelcoding.versemem.quiz_id";
 	
 	private String quizStyle;
 	private long verseId;
+	private int quizId;
+	private int resultStatus = -1;
+	private boolean success;
+	private final int STATUS_SHOWING_REF = 0;
+	private final int STATUS_NO_INPUT_SHOWING_ANSWER = 1;
+	private final int STATUS_SHOWING_RESULTS = 2;
+	private final int STATUS_KEYBOARD_SHOWING_ANSWER = 3;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +49,28 @@ public class QuizResultActivity extends Activity {
 	public void onStart(){
 		super.onStart();
 		Intent intent = getIntent();
-		quizStyle = intent.getStringExtra(QUIZ_STYLE);
-		verseId = intent.getLongExtra(VERSE_ID, -1);
-		showAnswer();
+		if(quizId != intent.getIntExtra(QUIZ_ID, -1)){
+			quizId = intent.getIntExtra(QUIZ_ID, -1);
+			quizStyle = intent.getStringExtra(QUIZ_STYLE);
+			verseId = intent.getLongExtra(VERSE_ID, -1);
+			showAnswer();
+		}
+	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig){
+		super.onConfigurationChanged(newConfig);
+		if(resultStatus == STATUS_SHOWING_RESULTS && quizStyle.equals(SettingsActivity.NO_INPUT)){
+			resultStatus = STATUS_NO_INPUT_SHOWING_ANSWER;
+			adjustView();
+			resultStatus = STATUS_SHOWING_RESULTS;
+		}
+		adjustView();
 	}
 	
 	public void showAnswer(){
 		if(quizStyle.equals(SettingsActivity.KEYBOARD_AUTO)){
-			boolean success = getIntent().getBooleanExtra(SUCCESS, false);
+			success = getIntent().getBooleanExtra(SUCCESS, false);
 			if(success) showAnswerSuccess();
 			else showAnswerFailure();
 			saveResult(success);
@@ -85,27 +108,20 @@ public class QuizResultActivity extends Activity {
 	
 	public void showAnswerKeyboard(){
 		setContentView(R.layout.quiz_result_keyboard);
-		String verseBody = getIntent().getStringExtra(VERSE_BODY);
-		String attempt = getIntent().getStringExtra(ATTEMPT);
-		String reference = getIntent().getStringExtra(REFERENCE);
-		TextView rightAnswerText = (TextView) findViewById(R.id.right_answer_text);
-		rightAnswerText.setText(reference + "\n\n" + verseBody);
-		TextView userAnswerText = (TextView) findViewById(R.id.user_answer_text);
-		userAnswerText.setText(getString(R.string.user_answer) + "\n\n" + attempt);
+		resultStatus = STATUS_KEYBOARD_SHOWING_ANSWER;
+		adjustView();
 	}
 	
 	public void showQuizNoInput(){
 		setContentView(R.layout.quiz_result_no_input);
+		resultStatus = STATUS_SHOWING_REF;
 		String reference = getIntent().getStringExtra(REFERENCE);
 		((TextView) findViewById(R.id.quiz_text)).setText(reference);
 	}
 	
-	public void showAnswerNoInput(View v){
-		TextView answerView = (TextView) findViewById(R.id.right_answer_text);
-		String verseBody = getIntent().getStringExtra(VERSE_BODY);
-		answerView.setText(verseBody);
-		findViewById(R.id.button_right).setVisibility(View.VISIBLE);
-		findViewById(R.id.button_wrong).setVisibility(View.VISIBLE);
+	public void showAnswerNoInput(View showAnswerButton){
+		resultStatus = STATUS_NO_INPUT_SHOWING_ANSWER;
+		adjustView();
 //		String[] verseArray = verseBody.split("\\s+");
 //		String currentAnswer = verseArray[0];
 //		answerView.setText(currentAnswer);
@@ -122,22 +138,11 @@ public class QuizResultActivity extends Activity {
 	}
 	
 	public void showResult(View v){
-		boolean success = false;
+		resultStatus = STATUS_SHOWING_RESULTS;
+		success = false;
 		if(v.getId()==R.id.button_right) success = true;
-		
 		saveResult(success);
-		findViewById(R.id.button_go_to_list).setVisibility(View.VISIBLE);
-		findViewById(R.id.button_right).setVisibility(View.INVISIBLE);
-		findViewById(R.id.button_wrong).setVisibility(View.INVISIBLE);
-		
-		if(success){
-			((TextView) findViewById(R.id.quiz_result_text)).setText(R.string.quiz_success);
-			findViewById(R.id.button_new_quiz).setVisibility(View.VISIBLE);
-		}
-		else{
-			((TextView) findViewById(R.id.quiz_result_text)).setText(R.string.quiz_failure_manual);
-			findViewById(R.id.button_requiz).setVisibility(View.VISIBLE);
-		}
+		adjustView();
 	}
 	
 	public void saveResult(boolean success){
@@ -162,6 +167,41 @@ public class QuizResultActivity extends Activity {
 		Intent intent = new Intent(this, VerseListActivity.class);
 		startActivity(intent);
 		finish();
+	}
+	
+	public void adjustView(){
+		switch(resultStatus){
+		case STATUS_NO_INPUT_SHOWING_ANSWER:
+            TextView answerView = (TextView) findViewById(R.id.right_answer_text);
+            String verseBody = getIntent().getStringExtra(VERSE_BODY);
+            answerView.setText(verseBody);
+            findViewById(R.id.button_show_answer).setVisibility(View.INVISIBLE);
+            findViewById(R.id.button_right).setVisibility(View.VISIBLE);
+            findViewById(R.id.button_wrong).setVisibility(View.VISIBLE);
+            break;
+		case STATUS_KEYBOARD_SHOWING_ANSWER:
+			verseBody = getIntent().getStringExtra(VERSE_BODY);
+			String attempt = getIntent().getStringExtra(ATTEMPT);
+			String reference = getIntent().getStringExtra(REFERENCE);
+			TextView rightAnswerText = (TextView) findViewById(R.id.right_answer_text);
+			rightAnswerText.setText(reference + "\n\n" + verseBody);
+			TextView userAnswerText = (TextView) findViewById(R.id.user_answer_text);
+			userAnswerText.setText(getString(R.string.user_answer) + "\n\n" + attempt);
+			break;
+		case STATUS_SHOWING_RESULTS:
+			findViewById(R.id.button_go_to_list).setVisibility(View.VISIBLE);
+			findViewById(R.id.button_right).setVisibility(View.INVISIBLE);
+			findViewById(R.id.button_wrong).setVisibility(View.INVISIBLE);
+			if(success){
+				((TextView) findViewById(R.id.quiz_result_text)).setText(R.string.quiz_success);
+				findViewById(R.id.button_new_quiz).setVisibility(View.VISIBLE);
+			}
+			else{
+				((TextView) findViewById(R.id.quiz_result_text)).setText(R.string.quiz_failure_manual);
+				findViewById(R.id.button_requiz).setVisibility(View.VISIBLE);
+			}
+			
+		}
 	}
 
 }

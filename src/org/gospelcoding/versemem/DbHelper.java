@@ -119,13 +119,14 @@ public class DbHelper extends SQLiteAssetHelper {
 		return verses;
 	}
 	
-	public int getNextAttemptId(){
-		//attempt id's start at 0 and increment for each attempt on any verse
+	public int getQuizId(){
+		//quiz id's start at 0 and increment for each attempt on any verse
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor c = db.query(Verse.VERSES_TABLE, new String[]{"SUM("+Verse.ATTEMPTS_COLUMN+")"}, null, null, null, null, null, null);
 		c.moveToFirst();
 		int attemptId = c.getInt(0);
 		c.close();
+		db.close();
 		return attemptId;
 	}
 
