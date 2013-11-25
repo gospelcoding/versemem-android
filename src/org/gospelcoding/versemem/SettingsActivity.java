@@ -126,9 +126,6 @@ public class SettingsActivity extends PreferenceActivity
 			
 			QuizMaster.setNextAlarm(this);
 		}
-		else if(key.equals(PREF_NOTIFICATION_VIBRATE) || key.equals(PREF_NOTIFICATION_LED)){
-			QuizMaster.setNextAlarm(this);
-		}
 		
 	}
 }
