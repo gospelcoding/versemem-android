@@ -4,6 +4,9 @@
     <string name="app_name">Verse Mem</string>
     <string name="action_quiz">Quiz</string>
     <string name="title_activity_quiz">QuizActivity</string>
+    <string name="record_button">Record</string>
+    <string name="rerecord_button">Re-Record</string>
+    <string name="stop_recording">Done</string>
     <string name="submit_quiz_button">Submit</string>
     <string name="quiz_success">Good!!</string>
     <string name="quiz_failure_auto">Not quite. Would you like to try again?</string>

@@ -1,7 +1,13 @@
 package org.gospelcoding.versemem;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.gospelcoding.versemem.R;
+
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -22,7 +28,12 @@ public class QuizActivity extends Activity{
 	private Verse quizVerse;
 	private String quizStyle;
 	private int quizId;
+	
+	//for microphone quiz
 	private boolean recordingNow = false;
+	private MediaRecorder recorder = null;
+	public static final String MICROPHONE_ATTEMPT_PATH = "/versemem";
+	public static final String MICROPHONE_ATTEMPT_FILE = "/recorded_verse.3gp";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +66,7 @@ public class QuizActivity extends Activity{
 			displayQuizKeyboard();
 		}
 		else if(quizStyle.equals(SettingsActivity.MICROPHONE)){
-			
+			displayQuizMicrophone();
 		}
 		else if(quizStyle.equals(SettingsActivity.NO_INPUT)){
 			submitQuizNoInput();
@@ -67,10 +78,70 @@ public class QuizActivity extends Activity{
 	
 	public void displayQuizKeyboard(){
 		setContentView(R.layout.quiz_keyboard);
-		String reference = quizVerse.getReference();
-		TextView quizText = (TextView) findViewById(R.id.quiz_text);
-		quizText.setText(reference);
+		((TextView) findViewById(R.id.quiz_text)).setText(quizVerse.getReference());
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+	}
+	
+	public void displayQuizMicrophone(){
+		setContentView(R.layout.quiz_microphone);
+		((TextView) findViewById(R.id.quiz_text)).setText(quizVerse.getReference());
+	}
+	
+	public void recordAttempt(View v){
+		if(recordingNow){
+			stopRecording();
+			setContentView(R.layout.quiz_microphone_recorded);
+		}
+		else{
+			startRecording();
+			((Button) findViewById(R.id.button_record)).setText(R.string.stop_recording);
+		}
+		recordingNow = !recordingNow;
+	}
+	
+	private String getRecordingFile(){
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+		path += MICROPHONE_ATTEMPT_PATH;
+		(new File(path)).mkdirs();
+		return path + MICROPHONE_ATTEMPT_FILE;
+	}
+	
+	public void startRecording(){
+		recorder = new MediaRecorder();
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        //TODO handle case where there is no sd card
+        recorder.setOutputFile(getRecordingFile());
+        
+
+            try {
+				recorder.prepare();
+	            recorder.start();
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+	
+	public void stopRecording(){
+        recorder.stop();
+        recorder.release();
+        recorder = null;
+	}
+	
+	public void submitQuizMicrophone(View v){
+		Intent intent = new Intent(this, QuizResultActivity.class);
+		intent.putExtra(QuizResultActivity.REFERENCE, quizVerse.getReference());
+		intent.putExtra(QuizResultActivity.VERSE_BODY, quizVerse.getBody());
+		intent.putExtra(QuizResultActivity.QUIZ_STYLE, quizStyle);
+		intent.putExtra(QuizResultActivity.VERSE_ID, quizVerse.getId());
+		intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
+		startActivity(intent);
+		finish();
 	}
 	
 	public void submitQuizNoInput(){
