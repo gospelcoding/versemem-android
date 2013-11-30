@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -91,13 +92,6 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		Spinner chapterSpinner = (Spinner) findViewById(R.id.verse_spinner);
 		chapterSpinner.setAdapter(adapter);
 		//Log.e("Spinners", "Updating verse spinner for book id " + bookId + " chapter "+currentChapter);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.new_verse, menu);
-		return true;
 	}
 	
 	public String getTranslation(){
@@ -176,4 +170,21 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		//do nothing?
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.new_verse, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+		case R.id.action_settings:
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);	
+		}
+	}
 }

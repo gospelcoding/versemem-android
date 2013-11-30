@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -43,6 +44,17 @@ public class QuizResultActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.quiz_result, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+		case R.id.action_settings:
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);	
+		}
 	}
 	
 	@Override
