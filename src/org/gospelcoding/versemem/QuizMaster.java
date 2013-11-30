@@ -16,7 +16,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.BaseAdapter;
 
-public class QuizMaster {
+public abstract class QuizMaster {
 	
 	public static DateTime getNextAlarm(SharedPreferences prefs){
 		int numAlarms = Integer.parseInt(prefs.getString(SettingsActivity.PREF_NOTIFICATION_NUMBER, "1"));
@@ -45,8 +45,12 @@ public class QuizMaster {
 		Intent notifyIntent = new Intent(context, QuizNotificationService.class);
 		notifyIntent.putExtra("Index", 60 * nextAlarm.getHourOfDay() + nextAlarm.getMinuteOfHour());
 		PendingIntent notifyPendingIntent = PendingIntent.getService(context, 0, notifyIntent, 0);
+		int alarmType = AlarmManager.RTC;
+		if(prefs.getBoolean(SettingsActivity.PREF_NOTIFICATION_VIBRATE, false) || 
+				prefs.getBoolean(SettingsActivity.PREF_NOTIFICATION_LED, false))
+			alarmType = AlarmManager.RTC_WAKEUP;
 		mAlarmManager.cancel(notifyPendingIntent);
-		mAlarmManager.set(AlarmManager.RTC, nextAlarm.getMillis(), notifyPendingIntent);
+		mAlarmManager.set(alarmType, nextAlarm.getMillis(), notifyPendingIntent);
 		Log.e("QuizMaster", "Alrm: "+nextAlarm.getHourOfDay() + ":" + nextAlarm.getMinuteOfHour());
 	}
 	
