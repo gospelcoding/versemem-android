@@ -29,32 +29,12 @@ import android.widget.ListAdapter;
 
 public class VerseListActivity extends ListActivity {
 	public static final String TAG = "VerseListActivity";
-	
-	private void showList(){
-		DbHelper dbhelper = new DbHelper(this);
-		//Cursor vCursor = dbhelper.getVersesCursor();
-		
-//		ListAdapter adapter = new SimpleCursorAdapter(
-//				this,
-//				android.R.layout.two_line_list_item,
-//				vCursor,
-//				new String[] {"reference", "status"},
-//				new int[] {android.R.id.text1, android.R.id.text2});
-//		setListAdapter(adapter);
-		List<Verse> verses = dbhelper.getAllVerses();
-		ArrayAdapter<Verse> adapter = new ArrayAdapter<Verse>(this, android.R.layout.simple_list_item_1, verses);
-		setListAdapter(adapter);	
-		if(verses.size() == 0){
-			getNewVerse();
-		}
-	}
 			
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		//setContentView(R.layout.activity_list);
-		//showList();
 		//tempCode();
 	}
 	
@@ -62,11 +42,6 @@ public class VerseListActivity extends ListActivity {
 	protected void onStart(){
 		super.onStart();
 		showList();
-	}
-
-	private void startQuiz(){
-		Intent intent = new Intent(this, QuizActivity.class);
-		startActivity(intent);
 	}
 	
 	public void getNewVerse(){
@@ -98,13 +73,19 @@ public class VerseListActivity extends ListActivity {
 		}
 	}
 	
-	private void tempCode(){
-		AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		DateTime now = DateTime.now();
-		DateTime alarm = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 14, 10);
-		long oneDayInMillis = 1 * 24 * 60 * 60 * 1000;
-		PendingIntent notifyPendingIntent = PendingIntent.getService(this, 0, new Intent(this, QuizNotificationService.class), 0);
-		mAlarmManager.setRepeating(AlarmManager.RTC, alarm.getMillis(), oneDayInMillis, notifyPendingIntent);
+	private void showList(){
+		DbHelper dbhelper = new DbHelper(this);
+		List<Verse> verses = dbhelper.getAllVerses();
+		ArrayAdapter<Verse> adapter = new ArrayAdapter<Verse>(this, android.R.layout.simple_list_item_1, verses);
+		setListAdapter(adapter);	
+		if(verses.size() == 0){
+			getNewVerse();
+		}
+	}
+
+	private void startQuiz(){
+		Intent intent = new Intent(this, QuizActivity.class);
+		startActivity(intent);
 	}
 
 }

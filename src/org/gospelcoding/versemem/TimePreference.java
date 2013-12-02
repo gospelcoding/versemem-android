@@ -14,6 +14,36 @@ public class TimePreference extends DialogPreference {
     private int lastMinute=0;
     private TimePicker picker=null;
 
+    private static final int TIME_PICKER_INTERVAL=15;
+    private boolean mIgnoreEvent=false;
+    
+    /*Time Picker with 15 minute intervals by Mark Horgan */
+    private TimePicker.OnTimeChangedListener mTimePickerListener=new TimePicker.OnTimeChangedListener(){
+        public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute){
+            if (mIgnoreEvent)
+                return;
+            if (minute%TIME_PICKER_INTERVAL!=0){
+                int minuteFloor=minute-(minute%TIME_PICKER_INTERVAL);
+                minute=minuteFloor + (minute==minuteFloor+1 ? TIME_PICKER_INTERVAL : 0);
+                if (minute==60)
+                    minute=0;
+                mIgnoreEvent=true;
+                timePicker.setCurrentMinute(minute);
+                mIgnoreEvent=false;
+            }
+
+        }
+    };
+    
+    public TimePreference(Context ctxt, AttributeSet attrs) {
+        super(ctxt, attrs);
+
+        setPositiveButtonText("Set");
+        setNegativeButtonText("Cancel");
+        
+        
+    }
+
     public static int getHour(String time) {
         String[] pieces=time.split(":");
 
@@ -25,13 +55,13 @@ public class TimePreference extends DialogPreference {
 
         return(Integer.parseInt(pieces[1]));
     }
-    
 
-    public TimePreference(Context ctxt, AttributeSet attrs) {
-        super(ctxt, attrs);
+    @Override
+    protected void onBindDialogView(View v) {
+        super.onBindDialogView(v);
 
-        setPositiveButtonText("Set");
-        setNegativeButtonText("Cancel");
+        picker.setCurrentHour(lastHour);
+        picker.setCurrentMinute(lastMinute);
     }
 
     @Override
@@ -40,14 +70,6 @@ public class TimePreference extends DialogPreference {
         picker.setOnTimeChangedListener(mTimePickerListener);
 
         return(picker);
-    }
-
-    @Override
-    protected void onBindDialogView(View v) {
-        super.onBindDialogView(v);
-
-        picker.setCurrentHour(lastHour);
-        picker.setCurrentMinute(lastMinute);
     }
 
     @Override
@@ -90,25 +112,4 @@ public class TimePreference extends DialogPreference {
         lastHour=getHour(time);
         lastMinute=getMinute(time);
     }
-    
-    private static final int TIME_PICKER_INTERVAL=15;
-    private boolean mIgnoreEvent=false;
-
-    /*Time Picker with 15 minute intervals by Mark Horgan */
-    private TimePicker.OnTimeChangedListener mTimePickerListener=new TimePicker.OnTimeChangedListener(){
-        public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute){
-            if (mIgnoreEvent)
-                return;
-            if (minute%TIME_PICKER_INTERVAL!=0){
-                int minuteFloor=minute-(minute%TIME_PICKER_INTERVAL);
-                minute=minuteFloor + (minute==minuteFloor+1 ? TIME_PICKER_INTERVAL : 0);
-                if (minute==60)
-                    minute=0;
-                mIgnoreEvent=true;
-                timePicker.setCurrentMinute(minute);
-                mIgnoreEvent=false;
-            }
-
-        }
-    };
 }

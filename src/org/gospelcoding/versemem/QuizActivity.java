@@ -41,34 +41,6 @@ public class QuizActivity extends Activity{
 		displayQuiz();
 	}
 	
-	public static String getRecordingFilename(){
-		return getRecordingFilepath() + "/recorded_verse.3gp";
-	}
-	
-	public static String getRecordingFilepath(){
-		return Environment.getExternalStorageDirectory().getAbsolutePath() + "/versemem";
-	}
-	
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.quiz, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-		case R.id.action_settings:
-			startActivity(new Intent(this, SettingsActivity.class));
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);	
-		}
-	}
-
-	
 	private void displayQuiz(){
 		long requizId = getIntent().getLongExtra(QuizResultActivity.VERSE_ID, -1);
 		if(requizId > 0){
@@ -105,6 +77,38 @@ public class QuizActivity extends Activity{
 		((TextView) findViewById(R.id.quiz_text)).setText(quizVerse.getReference());
 	}
 	
+	private String getRecordingFile(){
+		String path = getRecordingFilepath();
+		(new File(path)).mkdirs();
+		return getRecordingFilename();
+	}
+	
+	public static String getRecordingFilename(){
+		return getRecordingFilepath() + "/recorded_verse.3gp";
+	}
+	
+	public static String getRecordingFilepath(){
+		return Environment.getExternalStorageDirectory().getAbsolutePath() + "/versemem";
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.quiz, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+		case R.id.action_settings:
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);	
+		}
+	}
+	
 	public void recordAttempt(View v){
 		if(recordingNow){
 			stopRecording();
@@ -115,12 +119,6 @@ public class QuizActivity extends Activity{
 			((Button) findViewById(R.id.button_record)).setText(R.string.stop_recording);
 		}
 		recordingNow = !recordingNow;
-	}
-	
-	private String getRecordingFile(){
-		String path = getRecordingFilepath();
-		(new File(path)).mkdirs();
-		return getRecordingFilename();
 	}
 	
 	public void startRecording(){
@@ -150,6 +148,24 @@ public class QuizActivity extends Activity{
         recorder = null;
 	}
 	
+	public void submitQuizKeyboard(View view){
+		EditText quizAttempt = (EditText) findViewById(R.id.quiz_attempt);
+		String attempt = quizAttempt.getText().toString();
+		Intent intent = new Intent(this, QuizResultActivity.class);
+		intent.putExtra(QuizResultActivity.ATTEMPT, attempt);
+		intent.putExtra(QuizResultActivity.REFERENCE, quizVerse.getReference());
+		intent.putExtra(QuizResultActivity.VERSE_BODY, quizVerse.getBody());
+		intent.putExtra(QuizResultActivity.QUIZ_STYLE, quizStyle);
+		intent.putExtra(QuizResultActivity.VERSE_ID, quizVerse.getId());
+		intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
+		if(quizStyle.equals(SettingsActivity.KEYBOARD_AUTO)){
+			boolean result = quizVerse.checkAttempt(attempt);
+			intent.putExtra(QuizResultActivity.SUCCESS, result);
+		}
+		startActivity(intent);
+		finish();
+	}
+	
 	public void submitQuizMicrophone(View v){
 		Intent intent = new Intent(this, QuizResultActivity.class);
 		intent.putExtra(QuizResultActivity.REFERENCE, quizVerse.getReference());
@@ -168,24 +184,6 @@ public class QuizActivity extends Activity{
 		intent.putExtra(QuizResultActivity.QUIZ_STYLE, quizStyle);
 		intent.putExtra(QuizResultActivity.VERSE_ID, quizVerse.getId());
 		intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
-		startActivity(intent);
-		finish();
-	}
-	
-	public void submitQuizKeyboard(View view){
-		EditText quizAttempt = (EditText) findViewById(R.id.quiz_attempt);
-		String attempt = quizAttempt.getText().toString();
-		Intent intent = new Intent(this, QuizResultActivity.class);
-		intent.putExtra(QuizResultActivity.ATTEMPT, attempt);
-		intent.putExtra(QuizResultActivity.REFERENCE, quizVerse.getReference());
-		intent.putExtra(QuizResultActivity.VERSE_BODY, quizVerse.getBody());
-		intent.putExtra(QuizResultActivity.QUIZ_STYLE, quizStyle);
-		intent.putExtra(QuizResultActivity.VERSE_ID, quizVerse.getId());
-		intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
-		if(quizStyle.equals(SettingsActivity.KEYBOARD_AUTO)){
-			boolean result = quizVerse.checkAttempt(attempt);
-			intent.putExtra(QuizResultActivity.SUCCESS, result);
-		}
 		startActivity(intent);
 		finish();
 	}

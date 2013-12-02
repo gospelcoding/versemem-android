@@ -39,6 +39,30 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 	private String verseBody;
 	private DbHelper dbhelper;
 	
+	private class DownloadVerseTask extends AsyncTask<URL, Void, String> {
+		@Override
+		protected String doInBackground(URL... urls) {
+			URL url = urls[0];
+			HttpURLConnection conn;
+			try {
+				conn = (HttpURLConnection) url.openConnection();
+				InputStream in = new BufferedInputStream(conn.getInputStream());
+				verseBody = new Scanner(in, "UTF-8").useDelimiter("\\A").next();
+				return verseBody;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return "Sorry, that verse could not be found. (Do you have an internet connection?)";
+			}
+		}
+		
+		protected void onPostExecute(String body){
+			TextView previewVerse = (TextView) findViewById(R.id.text_preview_verse);
+			previewVerse.setText(body);
+			Button addVerseButton = (Button) findViewById(R.id.button_add_verse);
+			addVerseButton.setVisibility(View.VISIBLE);
+		}
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -62,6 +86,73 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		chapterSpinner.setOnItemSelectedListener(this);
 		Spinner verseSpinner = (Spinner) findViewById(R.id.verse_spinner);
 		verseSpinner.setOnItemSelectedListener(this);
+	}
+	
+	public void addNewVerse(View v){
+		//runs when add verse button is clicked
+		
+		String reference = currentBook.getName() + " " + currentChapter + ":" + currentVerse;
+		Verse newVerse = new Verse(reference, verseBody);
+		newVerse.insertVerse(dbhelper);
+		finish();
+	}
+	
+	public void getNewVerse(View v){
+		//runs when new verse button is clicked
+		String urlString = "http://gospelcoding.org/bible/"; /* TODO put a real translation in here */
+		urlString += getTranslation() + "/";
+		urlString += currentBook.getWebName() + "-" + currentChapter + "-" + currentVerse;
+		try {
+			URL url = new URL(urlString);
+			new DownloadVerseTask().execute(url);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public String getTranslation(){
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String translation = prefs.getString(SettingsActivity.PREF_TRANSLATION, SettingsActivity.DEFAULT_TRANSLATION);
+		return translation;
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.new_verse, menu);
+		return true;
+	}
+
+	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id){
+		switch(((View) view.getParent()).getId()){
+		case R.id.books_spinner:
+			currentBook = (Book) parent.getItemAtPosition(pos);
+			updateChapterSpinner();
+			break;
+		case R.id.chapter_spinner:
+			currentChapter = (Integer) parent.getItemAtPosition(pos);
+			updateVerseSpinner();
+			break;
+		case R.id.verse_spinner:
+			currentVerse = (Integer) parent.getItemAtPosition(pos);
+		}
+		//Log.e("NewVerseActivity", "View Id: "+((View) view.getParent()).getId() + "\nSpinner Id: "+R.id.books_spinner);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+		case R.id.action_settings:
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);	
+		}
+	}
+	
+	public void onNothingSelected(AdapterView<?> parent){
+		//do nothing?
 	}
 	
 	private void updateChapterSpinner(){
@@ -92,99 +183,5 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		Spinner chapterSpinner = (Spinner) findViewById(R.id.verse_spinner);
 		chapterSpinner.setAdapter(adapter);
 		//Log.e("Spinners", "Updating verse spinner for book id " + bookId + " chapter "+currentChapter);
-	}
-	
-	public String getTranslation(){
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		String translation = prefs.getString(SettingsActivity.PREF_TRANSLATION, SettingsActivity.DEFAULT_TRANSLATION);
-		return translation;
-	}
-	
-	public void getNewVerse(View v){
-		//runs when new verse button is clicked
-		String urlString = "http://gospelcoding.org/bible/"; /* TODO put a real translation in here */
-		urlString += getTranslation() + "/";
-		urlString += currentBook.getWebName() + "-" + currentChapter + "-" + currentVerse;
-		try {
-			URL url = new URL(urlString);
-			new DownloadVerseTask().execute(url);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private class DownloadVerseTask extends AsyncTask<URL, Void, String> {
-		@Override
-		protected String doInBackground(URL... urls) {
-			URL url = urls[0];
-			HttpURLConnection conn;
-			try {
-				conn = (HttpURLConnection) url.openConnection();
-				InputStream in = new BufferedInputStream(conn.getInputStream());
-				verseBody = new Scanner(in, "UTF-8").useDelimiter("\\A").next();
-				return verseBody;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return "Sorry, that verse could not be found. (Do you have an internet connection?)";
-			}
-		}
-		
-		protected void onPostExecute(String body){
-			TextView previewVerse = (TextView) findViewById(R.id.text_preview_verse);
-			previewVerse.setText(body);
-			Button addVerseButton = (Button) findViewById(R.id.button_add_verse);
-			addVerseButton.setVisibility(View.VISIBLE);
-		}
-	}
-	
-	public void addNewVerse(View v){
-		//runs when add verse button is clicked
-		
-		String reference = currentBook.getName() + " " + currentChapter + ":" + currentVerse;
-		Verse newVerse = new Verse(reference, verseBody);
-		newVerse.insertVerse(dbhelper);
-		finish();
-	}
-
-	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id){
-		switch(((View) view.getParent()).getId()){
-		case R.id.books_spinner:
-			currentBook = (Book) parent.getItemAtPosition(pos);
-			updateChapterSpinner();
-			break;
-		case R.id.chapter_spinner:
-			currentChapter = (Integer) parent.getItemAtPosition(pos);
-			updateVerseSpinner();
-			break;
-		case R.id.verse_spinner:
-			currentVerse = (Integer) parent.getItemAtPosition(pos);
-		}
-		//Log.e("NewVerseActivity", "View Id: "+((View) view.getParent()).getId() + "\nSpinner Id: "+R.id.books_spinner);
-	}
-	
-	public void onNothingSelected(AdapterView<?> parent){
-		//do nothing?
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.new_verse, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-		case R.id.action_settings:
-			startActivity(new Intent(this, SettingsActivity.class));
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);	
-		}
 	}
 }

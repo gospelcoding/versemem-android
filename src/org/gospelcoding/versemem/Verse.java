@@ -75,60 +75,6 @@ public class Verse {
 		lastAttempt = lastAttemptFromString(DbHelper.getCursorString(cursor, Verse.LAST_ATTEMPT_COLUMN));
 	}
 	
-//	public Verse(long newId, String newReference, String newBody, int newStatus, int newRight, 
-//			int newAttempts, int newStreak, int newStreakType, String newDate, float newWeight){
-//		id = newId;
-//		reference = newReference;
-//		body = newBody;
-//		status = newStatus;
-//		right = newRight;
-//		attempts = newAttempts;
-//		streak = newStreak;
-//		streakType = newStreakType;
-//		weight = newWeight;
-//		lastAttempt = lastAttemptFromString(newDate);	
-//	}
-	
-	public long insertVerse(DbHelper dbhelper){
-		ContentValues values = getInsertValues();
-		SQLiteDatabase db = dbhelper.getWritableDatabase();
-		long verseId = db.insert(Verse.VERSES_TABLE, null, values);
-		setBlitzWeights(verseId, dbhelper);
-		return verseId;
-	}
-	
-	public static Verse getVerse(DbHelper dbhelper, long id){
-		SQLiteDatabase db = dbhelper.getReadableDatabase();
-		Cursor c = db.query(VERSES_TABLE, null, getIdWhereClause(id), null, null, null, null, null);
-		c.moveToFirst();
-		Verse v = new Verse(c);
-		c.close();
-		db.close();
-		return v;
-	}
-	
-	public static Verse getQuizVerse(DbHelper dbhelper, long id){
-		return getVerse(dbhelper, id);
-	}
-	
-	public static Verse getQuizVerse(DbHelper dbhelper){
-		SQLiteDatabase db = dbhelper.getReadableDatabase();
-		String[] columns = new String[] {ID_COLUMN, WEIGHT_COLUMN};
-		Cursor cursor = db.query("verses", columns, null, null, null, null, ID_COLUMN, null);
-		cursor.moveToFirst();
-		double r = Math.random();
-		double sum = DbHelper.getCursorDouble(cursor, WEIGHT_COLUMN);
-		while(sum <= r && !cursor.isLast()){
-			cursor.moveToNext();
-			double w = DbHelper.getCursorDouble(cursor, WEIGHT_COLUMN);
-			sum += w;
-		}
-		long id = DbHelper.getCursorInt(cursor, ID_COLUMN);
-		cursor.close();
-		db.close();
-		return getVerse(dbhelper, id);
-	}
-	
 	public boolean checkAttempt(String attempt){
 		String[] bodyArray = body.split("\\s+");  //regex should greedily grab whitespace
 		String[] attemptArray = attempt.split("\\s+");
@@ -158,6 +104,107 @@ public class Verse {
 		
 		return true;
 	}
+
+	public int getAttempts(){ return attempts; }
+	
+	public String getBody(){ return body; }
+	
+	public long getId(){ return id; }
+	
+	public static String getIdWhereClause(long id){
+		return ID_COLUMN + " = " + id;
+	}
+	
+	public ContentValues getInsertValues(){
+		return makeContentValues();
+	}
+	
+	public LocalDate getLastAttempt(){ return lastAttempt; }
+	
+	public String getLastAttemptString(){
+		return lastAttempt.getYear() + "-" + lastAttempt.getMonthOfYear() + "-" + lastAttempt.getDayOfMonth();
+	}
+	
+	public static Verse getQuizVerse(DbHelper dbhelper, long id){
+		return getVerse(dbhelper, id);
+	}
+	
+	public static Verse getQuizVerse(DbHelper dbhelper){
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		String[] columns = new String[] {ID_COLUMN, WEIGHT_COLUMN};
+		Cursor cursor = db.query("verses", columns, null, null, null, null, ID_COLUMN, null);
+		cursor.moveToFirst();
+		double r = Math.random();
+		double sum = DbHelper.getCursorDouble(cursor, WEIGHT_COLUMN);
+		while(sum <= r && !cursor.isLast()){
+			cursor.moveToNext();
+			double w = DbHelper.getCursorDouble(cursor, WEIGHT_COLUMN);
+			sum += w;
+		}
+		long id = DbHelper.getCursorInt(cursor, ID_COLUMN);
+		cursor.close();
+		db.close();
+		return getVerse(dbhelper, id);
+	}
+	
+	public static Verse getVerse(DbHelper dbhelper, long id){
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		Cursor c = db.query(VERSES_TABLE, null, getIdWhereClause(id), null, null, null, null, null);
+		c.moveToFirst();
+		Verse v = new Verse(c);
+		c.close();
+		db.close();
+		return v;
+	}
+	
+	public String getReference(){ return reference; }
+	
+	public int getRight(){ return right; }
+	
+	public int getStatus(){ return status; }
+	
+	public String getStatusString(){
+		switch(status){
+		case STATUS_LEARNING: return "Learning";
+		case STATUS_REFRESHING: return "Refreshing";
+		case STATUS_MASTERED: return "Mastered";
+		}
+		return "";
+	}
+	
+	public int getStreak(){ return streak; }
+	
+	public int getStreakType(){ return streakType; }
+	
+	public float getWeight(){ return weight; }
+	
+	public long insertVerse(DbHelper dbhelper){
+		ContentValues values = getInsertValues();
+		SQLiteDatabase db = dbhelper.getWritableDatabase();
+		long verseId = db.insert(Verse.VERSES_TABLE, null, values);
+		setBlitzWeights(verseId, dbhelper);
+		return verseId;
+	}
+
+ 	public static LocalDate lastAttemptFromString(String s){
+		String[] params = s.split("-");
+		return new LocalDate(Integer.parseInt(params[0]), Integer.parseInt(params[1]), Integer.parseInt(params[2]));
+	}
+
+	private ContentValues makeContentValues(){
+		ContentValues values = new ContentValues();
+		values.put(REFERENCE_COLUMN, reference);
+		values.put(BODY_COLUMN, body);
+		values.put(STATUS_COLUMN, status);
+		values.put(RIGHT_COLUMN, right);
+		values.put(ATTEMPTS_COLUMN, attempts);
+		values.put(STREAK_COLUMN, streak);
+		values.put(STREAK_TYPE_COLUMN, streakType);
+		values.put(LAST_ATTEMPT_COLUMN, getLastAttemptString());
+		values.put(WEIGHT_COLUMN, weight);
+		return values;
+	}
+	
 	public static void saveQuizResult(DbHelper dbhelper, long verseId, boolean success){
 		Verse v = getVerse(dbhelper, verseId);
 		v.saveQuizResult(success, dbhelper);
@@ -289,54 +336,6 @@ public class Verse {
 		db.close();
 	}
 	
- 	public static LocalDate lastAttemptFromString(String s){
-		String[] params = s.split("-");
-		return new LocalDate(Integer.parseInt(params[0]), Integer.parseInt(params[1]), Integer.parseInt(params[2]));
-	}
-	
-	private ContentValues makeContentValues(){
-		ContentValues values = new ContentValues();
-		values.put(REFERENCE_COLUMN, reference);
-		values.put(BODY_COLUMN, body);
-		values.put(STATUS_COLUMN, status);
-		values.put(RIGHT_COLUMN, right);
-		values.put(ATTEMPTS_COLUMN, attempts);
-		values.put(STREAK_COLUMN, streak);
-		values.put(STREAK_TYPE_COLUMN, streakType);
-		values.put(LAST_ATTEMPT_COLUMN, getLastAttemptString());
-		values.put(WEIGHT_COLUMN, weight);
-		return values;
-	}
-	
-	//all the getters
-	public long getId(){ return id; }
-	public static String getIdWhereClause(long id){
-		return ID_COLUMN + " = " + id;
-	}
-	public String getReference(){ return reference; }
-	public String getBody(){ return body; }
-	public int getStatus(){ return status; }
-	public String getStatusString(){
-		switch(status){
-		case STATUS_LEARNING: return "Learning";
-		case STATUS_REFRESHING: return "Refreshing";
-		case STATUS_MASTERED: return "Mastered";
-		}
-		return "";
-	}
-	public int getRight(){ return right; }
-	public int getAttempts(){ return attempts; }
-	public int getStreak(){ return streak; }
-	public int getStreakType(){ return streakType; }
-	public LocalDate getLastAttempt(){ return lastAttempt; }
-	public String getLastAttemptString(){
-		return lastAttempt.getYear() + "-" + lastAttempt.getMonthOfYear() + "-" + lastAttempt.getDayOfMonth();
-	}
-	public float getWeight(){ return weight; }
-	
-	public ContentValues getInsertValues(){
-		return makeContentValues();
-	}
 	
 	//Will be used by ArrayAdapter in ListView
 	@Override

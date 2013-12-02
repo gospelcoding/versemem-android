@@ -63,11 +63,6 @@ public class SettingsActivity extends PreferenceActivity
 		prefScreen.addPreference(timePref);
 		
 	}
-	
-	public void dropTimePreference(){
-		PreferenceScreen prefScreen = getPreferenceScreen();
-		prefScreen.removePreference(prefScreen.getPreference(NOTIFICATION_TIME_ORDER));
-	}
 
 	@SuppressWarnings("deprecation")
 	public void changeNotificationNumber(){
@@ -87,27 +82,10 @@ public class SettingsActivity extends PreferenceActivity
 		}
 		oldNumberOfNotifications = numberOfNotifications;
 	}
-
-	public static String printableTime(String time){
-		boolean pm = false;
-		int h = TimePreference.getHour(time);
-		int m = TimePreference.getMinute(time);
-		if(h > 12){
-			pm = true;
-			h += -12;
-		}
-		else if(h == 12){
-			pm = true;
-		}
-		else if(h == 0){
-			h += 12;
-		}
-		String pTime = h + ":";
-		if(m < 10) pTime += "0";
-		pTime += m;
-		if(pm) pTime += "pm";
-		return pTime;
-		
+	
+	public void dropTimePreference(){
+		PreferenceScreen prefScreen = getPreferenceScreen();
+		prefScreen.removePreference(prefScreen.getPreference(NOTIFICATION_TIME_ORDER));
 	}
 	
 	@Override
@@ -129,6 +107,28 @@ public class SettingsActivity extends PreferenceActivity
 		else if(key.equals(PREF_NOTIFICATION_VIBRATE) || key.equals(PREF_NOTIFICATION_LED)){
 			QuizMaster.setNextAlarm(this);
 		}
+		
+	}
+
+	public static String printableTime(String time){
+		boolean pm = false;
+		int h = TimePreference.getHour(time);
+		int m = TimePreference.getMinute(time);
+		if(h > 12){
+			pm = true;
+			h += -12;
+		}
+		else if(h == 12){
+			pm = true;
+		}
+		else if(h == 0){
+			h += 12;
+		}
+		String pTime = h + ":";
+		if(m < 10) pTime += "0";
+		pTime += m;
+		if(pm) pTime += "pm";
+		return pTime;
 		
 	}
 }

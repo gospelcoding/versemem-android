@@ -46,24 +46,6 @@ public class QuizResultActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.quiz_result, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-		case R.id.action_settings:
-			startActivity(new Intent(this, SettingsActivity.class));
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);	
-		}
-	}
 	
 	@Override
 	public void onStart(){
@@ -90,161 +72,6 @@ public class QuizResultActivity extends Activity {
 			mPlayer.release();
 			mPlayer = null;
 		}
-	}
-	
-	@Override
-	public void onConfigurationChanged(Configuration newConfig){
-		super.onConfigurationChanged(newConfig);
-		if(resultStatus == STATUS_SHOWING_RESULTS && quizStyle.equals(SettingsActivity.NO_INPUT)){
-			resultStatus = STATUS_NO_INPUT_SHOWING_ANSWER;
-			adjustView();
-			resultStatus = STATUS_SHOWING_RESULTS;
-		}
-		adjustView();
-	}
-	
-	public void showAnswer(){
-		if(quizStyle.equals(SettingsActivity.KEYBOARD_AUTO)){
-			success = getIntent().getBooleanExtra(SUCCESS, false);
-			if(success) showAnswerSuccess();
-			else showAnswerFailure();
-			saveResult(success);
-		}
-		else if(quizStyle.equals(SettingsActivity.KEYBOARD_SELF)){
-			showAnswerKeyboard();
-		}
-		else if(quizStyle.equals(SettingsActivity.MICROPHONE)){
-			showAnswerMicrophone();
-		}
-		else if(quizStyle.equals(SettingsActivity.NO_INPUT)){
-			showQuizNoInput();
-		}
-		else{
-			Log.e("QuizResultActivity", "Unknown quiz type: "+quizStyle);
-		}
-	}
-	
-	public void showAnswerSuccess(){
-		setContentView(R.layout.quiz_result_success);
-		String verseBody = getIntent().getStringExtra(VERSE_BODY);
-		TextView resultText = (TextView) findViewById(R.id.quiz_result_text);
-		resultText.setText(getString(R.string.quiz_success) + "\n\n" + verseBody);
-	}
-	
-	public void showAnswerFailure(){
-		setContentView(R.layout.quiz_result_failure);
-		String verseBody = getIntent().getStringExtra(VERSE_BODY);
-		String attempt = getIntent().getStringExtra(ATTEMPT);
-		TextView rightAnswerText = (TextView) findViewById(R.id.right_answer_text);
-		rightAnswerText.setText(verseBody);
-		TextView wrongAnswerText = (TextView) findViewById(R.id.wrong_answer_text);
-		wrongAnswerText.setText(attempt);
-	}
-	
-	public void showAnswerKeyboard(){
-		setContentView(R.layout.quiz_result_keyboard);
-		resultStatus = STATUS_KEYBOARD_SHOWING_ANSWER;
-		adjustView();
-	}
-	
-	public void showAnswerMicrophone(){
-		setContentView(R.layout.quiz_result_microphone);
-		resultStatus = STATUS_MIC_SHOWING_ANSWER;
-		adjustView();
-		initMediaPlayer();
-		playPause((Button) findViewById(R.id.button_play));
-	}
-	
-	public void playPause(View v){
-		Button playButton = (Button) v;
-		try{
-			if(mPlayer.isPlaying()){
-				mPlayer.pause();
-				playButton.setText(R.string.play_button);
-			}
-			else{
-				mPlayer.start();
-				playButton.setText(R.string.pause_button);
-			}
-		} catch(IllegalStateException e){
-			e.printStackTrace();
-		}
-	}
-	
-	private void initMediaPlayer(){
-		mPlayer = new MediaPlayer();
-		OnCompletionListener doneListener = new OnCompletionListener(){
-			@Override
-			public void onCompletion(MediaPlayer mPlayer) {
-				((Button) findViewById(R.id.button_play)).setText(R.string.play_button);
-			}
-		};
-		try{
-			mPlayer.setDataSource(QuizActivity.getRecordingFilename());
-			mPlayer.setOnCompletionListener(doneListener);
-			mPlayer.prepare();
-		} catch (IOException e){
-			//TODO more here
-			e.printStackTrace();
-		}
-	}
-	
-	
-	public void showQuizNoInput(){
-		setContentView(R.layout.quiz_result_no_input);
-		resultStatus = STATUS_SHOWING_REF;
-		String reference = getIntent().getStringExtra(REFERENCE);
-		((TextView) findViewById(R.id.quiz_text)).setText(reference);
-	}
-	
-	public void showAnswerNoInput(View showAnswerButton){
-		resultStatus = STATUS_NO_INPUT_SHOWING_ANSWER;
-		adjustView();
-//		String[] verseArray = verseBody.split("\\s+");
-//		String currentAnswer = verseArray[0];
-//		answerView.setText(currentAnswer);
-//		for(int i=1; i<verseArray.length; ++i){
-//			try {
-//				Thread.sleep(300);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			currentAnswer += " " + verseArray[i];
-//			answerView.setText(currentAnswer);
-//		}
-	}
-	
-	public void showResult(View v){
-		resultStatus = STATUS_SHOWING_RESULTS;
-		success = false;
-		if(v.getId()==R.id.button_right) success = true;
-		saveResult(success);
-		adjustView();
-	}
-	
-	public void saveResult(boolean success){
-		DbHelper dbhelper = new DbHelper(this);
-		Verse.saveQuizResult(dbhelper, verseId, success);
-	}
-	
-	public void requiz(View v){
-		Intent intent = new Intent(this, QuizActivity.class);
-		intent.putExtra(VERSE_ID, verseId);
-		startActivity(intent);
-		finish();
-	}
-	
-	public void newQuiz(View v){
-		Intent intent = new Intent(this, QuizActivity.class);
-		startActivity(intent);
-		finish();
-	}
-	
-	public void goToList(View v){
-		Intent intent = new Intent(this, VerseListActivity.class);
-		startActivity(intent);
-		finish();
 	}
 	
 	public void adjustView(){
@@ -285,6 +112,179 @@ public class QuizResultActivity extends Activity {
 			}
 			
 		}
+	}
+	
+	public void goToList(View v){
+		Intent intent = new Intent(this, VerseListActivity.class);
+		startActivity(intent);
+		finish();
+	}
+	
+	private void initMediaPlayer(){
+		mPlayer = new MediaPlayer();
+		OnCompletionListener doneListener = new OnCompletionListener(){
+			@Override
+			public void onCompletion(MediaPlayer mPlayer) {
+				((Button) findViewById(R.id.button_play)).setText(R.string.play_button);
+			}
+		};
+		try{
+			mPlayer.setDataSource(QuizActivity.getRecordingFilename());
+			mPlayer.setOnCompletionListener(doneListener);
+			mPlayer.prepare();
+		} catch (IOException e){
+			//TODO more here
+			e.printStackTrace();
+		}
+	}
+	
+	public void newQuiz(View v){
+		Intent intent = new Intent(this, QuizActivity.class);
+		startActivity(intent);
+		finish();
+	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig){
+		super.onConfigurationChanged(newConfig);
+		if(resultStatus == STATUS_SHOWING_RESULTS && quizStyle.equals(SettingsActivity.NO_INPUT)){
+			resultStatus = STATUS_NO_INPUT_SHOWING_ANSWER;
+			adjustView();
+			resultStatus = STATUS_SHOWING_RESULTS;
+		}
+		adjustView();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.quiz_result, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+		case R.id.action_settings:
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);	
+		}
+	}
+	
+	public void playPause(View v){
+		Button playButton = (Button) v;
+		try{
+			if(mPlayer.isPlaying()){
+				mPlayer.pause();
+				playButton.setText(R.string.play_button);
+			}
+			else{
+				mPlayer.start();
+				playButton.setText(R.string.pause_button);
+			}
+		} catch(IllegalStateException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void requiz(View v){
+		Intent intent = new Intent(this, QuizActivity.class);
+		intent.putExtra(VERSE_ID, verseId);
+		startActivity(intent);
+		finish();
+	}
+	
+	public void saveResult(boolean success){
+		DbHelper dbhelper = new DbHelper(this);
+		Verse.saveQuizResult(dbhelper, verseId, success);
+	}
+	
+	public void showAnswer(){
+		if(quizStyle.equals(SettingsActivity.KEYBOARD_AUTO)){
+			success = getIntent().getBooleanExtra(SUCCESS, false);
+			if(success) showAnswerSuccess();
+			else showAnswerFailure();
+			saveResult(success);
+		}
+		else if(quizStyle.equals(SettingsActivity.KEYBOARD_SELF)){
+			showAnswerKeyboard();
+		}
+		else if(quizStyle.equals(SettingsActivity.MICROPHONE)){
+			showAnswerMicrophone();
+		}
+		else if(quizStyle.equals(SettingsActivity.NO_INPUT)){
+			showQuizNoInput();
+		}
+		else{
+			Log.e("QuizResultActivity", "Unknown quiz type: "+quizStyle);
+		}
+	}
+	
+	public void showAnswerFailure(){
+		setContentView(R.layout.quiz_result_failure);
+		String verseBody = getIntent().getStringExtra(VERSE_BODY);
+		String attempt = getIntent().getStringExtra(ATTEMPT);
+		TextView rightAnswerText = (TextView) findViewById(R.id.right_answer_text);
+		rightAnswerText.setText(verseBody);
+		TextView wrongAnswerText = (TextView) findViewById(R.id.wrong_answer_text);
+		wrongAnswerText.setText(attempt);
+	}
+	
+	public void showAnswerKeyboard(){
+		setContentView(R.layout.quiz_result_keyboard);
+		resultStatus = STATUS_KEYBOARD_SHOWING_ANSWER;
+		adjustView();
+	}
+	
+	public void showAnswerMicrophone(){
+		setContentView(R.layout.quiz_result_microphone);
+		resultStatus = STATUS_MIC_SHOWING_ANSWER;
+		adjustView();
+		initMediaPlayer();
+		playPause((Button) findViewById(R.id.button_play));
+	}
+	
+	public void showAnswerSuccess(){
+		setContentView(R.layout.quiz_result_success);
+		String verseBody = getIntent().getStringExtra(VERSE_BODY);
+		TextView resultText = (TextView) findViewById(R.id.quiz_result_text);
+		resultText.setText(getString(R.string.quiz_success) + "\n\n" + verseBody);
+	}
+	
+	
+	public void showQuizNoInput(){
+		setContentView(R.layout.quiz_result_no_input);
+		resultStatus = STATUS_SHOWING_REF;
+		String reference = getIntent().getStringExtra(REFERENCE);
+		((TextView) findViewById(R.id.quiz_text)).setText(reference);
+	}
+	
+	public void showAnswerNoInput(View showAnswerButton){
+		resultStatus = STATUS_NO_INPUT_SHOWING_ANSWER;
+		adjustView();
+//		String[] verseArray = verseBody.split("\\s+");
+//		String currentAnswer = verseArray[0];
+//		answerView.setText(currentAnswer);
+//		for(int i=1; i<verseArray.length; ++i){
+//			try {
+//				Thread.sleep(300);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			currentAnswer += " " + verseArray[i];
+//			answerView.setText(currentAnswer);
+//		}
+	}
+	
+	public void showResult(View v){
+		resultStatus = STATUS_SHOWING_RESULTS;
+		success = false;
+		if(v.getId()==R.id.button_right) success = true;
+		saveResult(success);
+		adjustView();
 	}
 
 }

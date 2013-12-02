@@ -14,11 +14,11 @@ public class Book {
 		name = book_name;
 		id = book_id;
 	}
-	
+
+	public int getId(){ return id; }
 	public String getName(){ return name; }
 	public String getWebName(){
 		return name.replace(" ", "-");
 	}
-	public int getId(){ return id; }
 	public String toString(){ return name; }
 }
