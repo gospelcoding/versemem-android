@@ -6,6 +6,8 @@
     <string name="title_activity_quiz">QuizActivity</string>
     <string name="record_button">Record</string>
     <string name="rerecord_button">Re-Record</string>
+    <string name="play_button">Play</string>
+    <string name="pause_button">Pause</string>
     <string name="stop_recording">Done</string>
     <string name="submit_quiz_button">Submit</string>
     <string name="quiz_success">Good!!</string>

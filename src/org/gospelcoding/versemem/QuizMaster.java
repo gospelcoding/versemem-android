@@ -47,8 +47,10 @@ public abstract class QuizMaster {
 		PendingIntent notifyPendingIntent = PendingIntent.getService(context, 0, notifyIntent, 0);
 		int alarmType = AlarmManager.RTC;
 		if(prefs.getBoolean(SettingsActivity.PREF_NOTIFICATION_VIBRATE, false) || 
-				prefs.getBoolean(SettingsActivity.PREF_NOTIFICATION_LED, false))
+				prefs.getBoolean(SettingsActivity.PREF_NOTIFICATION_LED, false)){
 			alarmType = AlarmManager.RTC_WAKEUP;
+			Log.e("VerseMem", "Set alarmCode to RTC_WAKEUP");
+		}
 		mAlarmManager.cancel(notifyPendingIntent);
 		mAlarmManager.set(alarmType, nextAlarm.getMillis(), notifyPendingIntent);
 		Log.e("QuizMaster", "Alrm: "+nextAlarm.getHourOfDay() + ":" + nextAlarm.getMinuteOfHour());

@@ -1,5 +1,9 @@
 package org.gospelcoding.versemem;
 
+import java.io.IOException;
+
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
@@ -11,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -33,6 +38,9 @@ public class QuizResultActivity extends Activity {
 	private final int STATUS_NO_INPUT_SHOWING_ANSWER = 1;
 	private final int STATUS_SHOWING_RESULTS = 2;
 	private final int STATUS_KEYBOARD_SHOWING_ANSWER = 3;
+	private final int STATUS_MIC_SHOWING_ANSWER = 4;
+	
+	private MediaPlayer mPlayer = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +69,26 @@ public class QuizResultActivity extends Activity {
 	public void onStart(){
 		super.onStart();
 		Intent intent = getIntent();
+		//TODO revisit this idea
 		if(quizId != intent.getIntExtra(QUIZ_ID, -1)){
 			quizId = intent.getIntExtra(QUIZ_ID, -1);
 			quizStyle = intent.getStringExtra(QUIZ_STYLE);
 			verseId = intent.getLongExtra(VERSE_ID, -1);
 			showAnswer();
+		}
+		else{
+			if(quizStyle.equals(SettingsActivity.MICROPHONE)){
+				initMediaPlayer();
+			}
+		}
+	}
+	
+	@Override
+	public void onStop(){
+		super.onStop();
+		if(mPlayer != null){
+			mPlayer.release();
+			mPlayer = null;
 		}
 	}
 	
@@ -91,7 +114,7 @@ public class QuizResultActivity extends Activity {
 			showAnswerKeyboard();
 		}
 		else if(quizStyle.equals(SettingsActivity.MICROPHONE)){
-			
+			showAnswerMicrophone();
 		}
 		else if(quizStyle.equals(SettingsActivity.NO_INPUT)){
 			showQuizNoInput();
@@ -123,6 +146,49 @@ public class QuizResultActivity extends Activity {
 		resultStatus = STATUS_KEYBOARD_SHOWING_ANSWER;
 		adjustView();
 	}
+	
+	public void showAnswerMicrophone(){
+		setContentView(R.layout.quiz_result_microphone);
+		resultStatus = STATUS_MIC_SHOWING_ANSWER;
+		adjustView();
+		initMediaPlayer();
+		playPause((Button) findViewById(R.id.button_play));
+	}
+	
+	public void playPause(View v){
+		Button playButton = (Button) v;
+		try{
+			if(mPlayer.isPlaying()){
+				mPlayer.pause();
+				playButton.setText(R.string.play_button);
+			}
+			else{
+				mPlayer.start();
+				playButton.setText(R.string.pause_button);
+			}
+		} catch(IllegalStateException e){
+			e.printStackTrace();
+		}
+	}
+	
+	private void initMediaPlayer(){
+		mPlayer = new MediaPlayer();
+		OnCompletionListener doneListener = new OnCompletionListener(){
+			@Override
+			public void onCompletion(MediaPlayer mPlayer) {
+				((Button) findViewById(R.id.button_play)).setText(R.string.play_button);
+			}
+		};
+		try{
+			mPlayer.setDataSource(QuizActivity.getRecordingFilename());
+			mPlayer.setOnCompletionListener(doneListener);
+			mPlayer.prepare();
+		} catch (IOException e){
+			//TODO more here
+			e.printStackTrace();
+		}
+	}
+	
 	
 	public void showQuizNoInput(){
 		setContentView(R.layout.quiz_result_no_input);
@@ -184,9 +250,9 @@ public class QuizResultActivity extends Activity {
 	public void adjustView(){
 		switch(resultStatus){
 		case STATUS_NO_INPUT_SHOWING_ANSWER:
-            TextView answerView = (TextView) findViewById(R.id.right_answer_text);
+            TextView rightAnswerText = (TextView) findViewById(R.id.right_answer_text);
             String verseBody = getIntent().getStringExtra(VERSE_BODY);
-            answerView.setText(verseBody);
+            rightAnswerText.setText(verseBody);
             findViewById(R.id.button_show_answer).setVisibility(View.INVISIBLE);
             findViewById(R.id.button_right).setVisibility(View.VISIBLE);
             findViewById(R.id.button_wrong).setVisibility(View.VISIBLE);
@@ -195,10 +261,15 @@ public class QuizResultActivity extends Activity {
 			verseBody = getIntent().getStringExtra(VERSE_BODY);
 			String attempt = getIntent().getStringExtra(ATTEMPT);
 			String reference = getIntent().getStringExtra(REFERENCE);
-			TextView rightAnswerText = (TextView) findViewById(R.id.right_answer_text);
+			rightAnswerText = (TextView) findViewById(R.id.right_answer_text);
 			rightAnswerText.setText(reference + "\n\n" + verseBody);
 			TextView userAnswerText = (TextView) findViewById(R.id.user_answer_text);
 			userAnswerText.setText(getString(R.string.user_answer) + "\n\n" + attempt);
+			break;
+		case STATUS_MIC_SHOWING_ANSWER:
+            rightAnswerText = (TextView) findViewById(R.id.right_answer_text);
+            verseBody = getIntent().getStringExtra(VERSE_BODY);
+            rightAnswerText.setText(verseBody);
 			break;
 		case STATUS_SHOWING_RESULTS:
 			findViewById(R.id.button_go_to_list).setVisibility(View.VISIBLE);

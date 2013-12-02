@@ -33,14 +33,20 @@ public class QuizActivity extends Activity{
 	//for microphone quiz
 	private boolean recordingNow = false;
 	private MediaRecorder recorder = null;
-	public static final String MICROPHONE_ATTEMPT_PATH = "/versemem";
-	public static final String MICROPHONE_ATTEMPT_FILE = "/recorded_verse.3gp";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		quizId = (new DbHelper(this)).getQuizId();
 		displayQuiz();
+	}
+	
+	public static String getRecordingFilename(){
+		return getRecordingFilepath() + "/recorded_verse.3gp";
+	}
+	
+	public static String getRecordingFilepath(){
+		return Environment.getExternalStorageDirectory().getAbsolutePath() + "/versemem";
 	}
 	
 
@@ -112,10 +118,9 @@ public class QuizActivity extends Activity{
 	}
 	
 	private String getRecordingFile(){
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-		path += MICROPHONE_ATTEMPT_PATH;
+		String path = getRecordingFilepath();
 		(new File(path)).mkdirs();
-		return path + MICROPHONE_ATTEMPT_FILE;
+		return getRecordingFilename();
 	}
 	
 	public void startRecording(){
