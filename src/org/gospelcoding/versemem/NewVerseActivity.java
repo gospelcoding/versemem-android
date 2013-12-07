@@ -51,15 +51,21 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 				return verseBody;
 			} catch (IOException e) {
 				e.printStackTrace();
-				return "Sorry, that verse could not be found. (Do you have an internet connection?)";
+				return "";
 			}
 		}
 		
 		protected void onPostExecute(String body){
 			TextView previewVerse = (TextView) findViewById(R.id.text_preview_verse);
-			previewVerse.setText(body);
-			Button addVerseButton = (Button) findViewById(R.id.button_add_verse);
-			addVerseButton.setVisibility(View.VISIBLE);
+			if(body.equals("")){
+				//error
+				previewVerse.setText("Sorry, that verse could not be found. (Do you have an internet connection?)");
+			}
+			else{
+				previewVerse.setText(body);
+				Button addVerseButton = (Button) findViewById(R.id.button_add_verse);
+				addVerseButton.setVisibility(View.VISIBLE);
+			}
 		}
 	}
 	
@@ -90,18 +96,33 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 	
 	public void addNewVerse(View v){
 		//runs when add verse button is clicked
-		
-		String reference = currentBook.getName() + " " + currentChapter + ":" + currentVerse;
+		String reference = currentBook.getName() + " " + currentChapter + ":" + currentVerse; //TODO this is not acceptable
 		Verse newVerse = new Verse(reference, verseBody);
 		newVerse.insertVerse(dbhelper);
 		finish();
 	}
 	
-	public void getNewVerse(View v){
-		//runs when new verse button is clicked
-		String urlString = "http://gospelcoding.org/bible/"; /* TODO put a real translation in here */
+	private String newVerseUrlOld(){
+		String urlString = "http://gospelcoding.org/bible/";
 		urlString += getTranslation() + "/";
 		urlString += currentBook.getWebName() + "-" + currentChapter + "-" + currentVerse;
+		return urlString;
+	}
+	
+	private String newVerseUrl(){
+		String urlString = "http://gospelcoding.org/bible/?";
+		urlString += "translation=1"; //TODO fix this!
+		urlString += "&book=" + currentBook.getNumber();
+		urlString += "&chapter1=" + currentChapter;
+		urlString += "&chapter2=" + currentChapter;
+		urlString += "&verse1=" + currentVerse;
+		urlString += "&verse2=" + currentVerse;
+		return urlString;
+	}
+	
+	public void getNewVerse(View v){
+		//runs when new verse button is clicked
+		String urlString = newVerseUrl();
 		try {
 			URL url = new URL(urlString);
 			new DownloadVerseTask().execute(url);
