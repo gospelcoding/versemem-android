@@ -72,11 +72,6 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
 		setContentView(R.layout.activity_new_verse);
 
 		dbhelper = new DbHelper(this);
@@ -92,6 +87,11 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		chapterSpinner.setOnItemSelectedListener(this);
 		Spinner verseSpinner = (Spinner) findViewById(R.id.verse_spinner);
 		verseSpinner.setOnItemSelectedListener(this);
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
 	}
 	
 	public void addNewVerse(View v){
@@ -111,7 +111,7 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 	
 	private String newVerseUrl(){
 		String urlString = "http://gospelcoding.org/bible/?";
-		urlString += "translation=1"; //TODO fix this!
+		urlString += "translation=" + getTranslation();
 		urlString += "&book=" + currentBook.getNumber();
 		urlString += "&chapter1=" + currentChapter;
 		urlString += "&chapter2=" + currentChapter;

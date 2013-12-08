@@ -13,8 +13,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DbHelper extends SQLiteAssetHelper {
-	public static final int DATABASE_VERSION = 2;
-	public static final String DATABASE_NAME = "versemem.db";
+	public static final int DATABASE_VERSION = 3;
+	public static final String DATABASE_NAME = "versemem";
 	public static final String TAG = "DbHelper";
 	
 	public static final String CHAPTER_NUMS_TABLE = "chapternums";

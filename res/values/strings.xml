@@ -19,7 +19,7 @@
     <string name="add_verse_button">Add Verse</string>
     <string name="action_settings">Settings</string>
     <string name="pref_translation">Translation</string>
-    <string name="pref_translation_default">kjv</string>
+    <string name="pref_translation_default">2</string>
     <string name="user_answer">You put:</string>
     <string name="show_answer_button">Show Answer</string>
     <string name="right_button">Right</string>
@@ -29,12 +29,10 @@
     <string name="go_to_list_button">Verse List</string>
 
     <string-array name="pref_translation_values">
-        <item>kjv</item>
-        <item>esv</item>
+        <item>2</item>
     </string-array>
     <string-array name="pref_translations">
         <item>King James Version</item>
-        <item>English Standard Version</item>
     </string-array>
 
     <string name="pref_notification_number">Daily Notifications</string>

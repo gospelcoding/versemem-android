@@ -3,6 +3,7 @@ package org.gospelcoding.versemem;
 import org.joda.time.DateTime;
 
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
@@ -25,7 +26,7 @@ public class SettingsActivity extends PreferenceActivity
 	public static final String PREF_NOTIFICATION_VIBRATE = "pref_notification_vibrate";
 	public static final String PREF_NOTIFICATION_LED = "pref_notification_led";
 	public static final String PREF_TRANSLATION = "pref_translation";
-	public static final String DEFAULT_TRANSLATION = "kjv";
+	public static final String DEFAULT_TRANSLATION = "2";  //kjv
 	public static final String PREF_QUIZ_STYLE = "pref_quiz_style";
 	public static final String KEYBOARD_AUTO = "Keyboard Auto-Check";
 	public static final String KEYBOARD_SELF= "Keyboard Self-Check";
@@ -40,6 +41,7 @@ public class SettingsActivity extends PreferenceActivity
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
 		
+		populateTranslationsPreference();
 		SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
 		prefs.registerOnSharedPreferenceChangeListener(this);
 		int numberOfNotifications = Integer.parseInt(prefs.getString(PREF_NOTIFICATION_NUMBER, "2"));
@@ -106,8 +108,14 @@ public class SettingsActivity extends PreferenceActivity
 		}
 		else if(key.equals(PREF_NOTIFICATION_VIBRATE) || key.equals(PREF_NOTIFICATION_LED)){
 			QuizMaster.setNextAlarm(this);
-		}
-		
+		}	
+	}
+	
+	private void populateTranslationsPreference(){
+		ListPreference translationsPref = (ListPreference) getPreferenceScreen().findPreference(PREF_TRANSLATION);
+		BunchOfTranslations bunch = new BunchOfTranslations(new DbHelper(this));
+		translationsPref.setEntryValues(bunch.getIds());
+		translationsPref.setEntries(bunch.getNames());
 	}
 
 	public static String printableTime(String time){
