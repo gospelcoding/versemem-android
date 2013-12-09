@@ -1,49 +1,118 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".NewVerseActivity" >
+    android:layout_height="match_parent" >
 
+<!--     <Spinner  -->
+<!--         android:id="@+id/translation_spinner" -->
+<!--         android:layout_width="wrap_content"  -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:layout_alignParentTop="true"/> -->
+    
+    <CheckBox
+        android:id="@+id/checkbox_multiverse"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:onClick="multiverseCheckbox"
+        android:text="@string/multiverse" />
+        
     <Spinner
         android:id="@+id/books_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" 	/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/checkbox_multiverse"	/>
 
     <Spinner
-        android:id="@+id/chapter_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <Spinner
-        android:id="@+id/verse_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"  />
-
-    <Button
-        android:id="@+id/button_new_verse"
+        android:id="@+id/chapter1_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/books_spinner" />
+
+    <TextView
+        android:id="@+id/text_verse1_colon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/books_spinner"
+        android:layout_toRightOf="@id/chapter1_spinner"
+        android:text="@string/colon"
+        style="@android:style/TextAppearance.Large" />
+        
+    <Spinner
+        android:id="@+id/verse1_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/books_spinner"
+        android:layout_toRightOf="@id/text_verse1_colon" />
+
+     <TextView
+        android:id="@+id/text_verse_dash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/books_spinner"
+        android:layout_toRightOf="@id/verse1_spinner"
+        android:text="@string/dash"
+        android:visibility="invisible"
+        style="@android:style/TextAppearance.Large" />
+     
+    <Button
+        android:id="@+id/button_get_verse1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/books_spinner"
+        android:layout_toRightOf="@id/verse1_spinner"
         android:text="@string/get_verse_button" 
         android:onClick="getNewVerse"  />
+     
+    <Spinner
+        android:id="@+id/chapter2_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chapter1_spinner"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/text_verse2_colon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chapter1_spinner"
+        android:layout_toRightOf="@id/chapter2_spinner"
+        android:text="@string/colon"
+        style="@android:style/TextAppearance.Large"
+        android:visibility="invisible" />
+        
+    <Spinner
+        android:id="@+id/verse2_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/chapter1_spinner"
+        android:layout_toRightOf="@id/text_verse2_colon"
+        android:visibility="invisible" />
+    
+    <Button
+        android:id="@+id/button_get_verse2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chapter1_spinner"
+        android:layout_toRightOf="@id/verse2_spinner"
+        android:text="@string/get_verse_button" 
+        android:onClick="getNewVerse"
+        android:visibility="invisible"  />
     
     <TextView
         android:id="@+id/text_preview_verse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/chapter2_spinner"
         android:text="" />
     
     <Button
         android:id="@+id/button_add_verse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/text_preview_verse"
         android:onClick="addNewVerse"
         android:text="@string/add_verse_button"
         android:visibility="invisible" />
     
-</LinearLayout>
+</RelativeLayout>

@@ -13,6 +13,9 @@
     <string name="quiz_success">Good!!</string>
     <string name="quiz_failure_auto">Not quite. Would you like to try again?</string>
     <string name="quiz_failure_manual">Sorry. Would you like to try again?</string>
+    <string name="multiverse">Multiple Verses</string>
+    <string name="colon">:</string>
+    <string name="dash">-</string>
     <string name="action_new_verse">New Verse</string>
     <string name="title_activity_new_verse">NewVerseActivity</string>
     <string name="get_verse_button">Get Verse</string>

@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,17 +28,24 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CursorAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 public class NewVerseActivity extends Activity implements OnItemSelectedListener{
 
 	private Book currentBook;
-	private int currentChapter;
-	private int currentVerse;
+	private int currentChapter1;
+	private int currentVerse1;
+	private int currentChapter2;
+	private int currentVerse2;
+	private String verseRef;
 	private String verseBody;
 	private DbHelper dbhelper;
+	private boolean multiverse = false;
+	private int maxVerses = 6;
 	
 	private class DownloadVerseTask extends AsyncTask<URL, Void, String> {
 		@Override
@@ -48,6 +56,7 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 				conn = (HttpURLConnection) url.openConnection();
 				InputStream in = new BufferedInputStream(conn.getInputStream());
 				verseBody = new Scanner(in, "UTF-8").useDelimiter("\\A").next();
+				setVerseRef();
 				return verseBody;
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -75,6 +84,7 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		setContentView(R.layout.activity_new_verse);
 
 		dbhelper = new DbHelper(this);
+		//setupTranslationsSpinner();
 		List<Book> books = dbhelper.getAllBooks(1);  /* TODO - make this translation id come from somewhere */
 		ArrayAdapter<Book> adapter = new ArrayAdapter<Book>(this, android.R.layout.simple_spinner_item, books);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -83,10 +93,14 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		bookSpinner.setOnItemSelectedListener(this);
 		bookSpinner.setAdapter(adapter);
 		
-		Spinner chapterSpinner = (Spinner) findViewById(R.id.chapter_spinner);
-		chapterSpinner.setOnItemSelectedListener(this);
-		Spinner verseSpinner = (Spinner) findViewById(R.id.verse_spinner);
-		verseSpinner.setOnItemSelectedListener(this);
+		Spinner chapter1Spinner = (Spinner) findViewById(R.id.chapter1_spinner);
+		chapter1Spinner.setOnItemSelectedListener(this);
+		Spinner chapter2Spinner = (Spinner) findViewById(R.id.chapter2_spinner);
+		chapter2Spinner.setOnItemSelectedListener(this);
+		Spinner verse1Spinner = (Spinner) findViewById(R.id.verse1_spinner);
+		verse1Spinner.setOnItemSelectedListener(this);
+		Spinner verse2Spinner = (Spinner) findViewById(R.id.verse2_spinner);
+		verse2Spinner.setOnItemSelectedListener(this);
 	}
 	
 	@Override
@@ -96,28 +110,9 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 	
 	public void addNewVerse(View v){
 		//runs when add verse button is clicked
-		String reference = currentBook.getName() + " " + currentChapter + ":" + currentVerse; //TODO this is not acceptable
-		Verse newVerse = new Verse(reference, verseBody);
+		Verse newVerse = new Verse(verseRef, verseBody);
 		newVerse.insertVerse(dbhelper);
 		finish();
-	}
-	
-	private String newVerseUrlOld(){
-		String urlString = "http://gospelcoding.org/bible/";
-		urlString += getTranslation() + "/";
-		urlString += currentBook.getWebName() + "-" + currentChapter + "-" + currentVerse;
-		return urlString;
-	}
-	
-	private String newVerseUrl(){
-		String urlString = "http://gospelcoding.org/bible/?";
-		urlString += "translation=" + getTranslation();
-		urlString += "&book=" + currentBook.getNumber();
-		urlString += "&chapter1=" + currentChapter;
-		urlString += "&chapter2=" + currentChapter;
-		urlString += "&verse1=" + currentVerse;
-		urlString += "&verse2=" + currentVerse;
-		return urlString;
 	}
 	
 	public void getNewVerse(View v){
@@ -132,11 +127,56 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		}
 	}
 	
-	public String getTranslation(){
+	public String getTranslationPref(){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String translation = prefs.getString(SettingsActivity.PREF_TRANSLATION, SettingsActivity.DEFAULT_TRANSLATION);
 		return translation;
 	}
+	
+	public void multiverseCheckbox(View v){
+		multiverse = ((CheckBox) v).isChecked();
+		if(multiverse){
+			findViewById(R.id.chapter2_spinner).setVisibility(View.VISIBLE);
+			findViewById(R.id.text_verse2_colon).setVisibility(View.VISIBLE);
+			findViewById(R.id.verse2_spinner).setVisibility(View.VISIBLE);
+			findViewById(R.id.text_verse_dash).setVisibility(View.VISIBLE);
+			findViewById(R.id.button_get_verse1).setVisibility(View.INVISIBLE);
+			findViewById(R.id.button_get_verse2).setVisibility(View.VISIBLE);
+		}
+		else{
+			findViewById(R.id.chapter2_spinner).setVisibility(View.INVISIBLE);
+			findViewById(R.id.text_verse2_colon).setVisibility(View.INVISIBLE);
+			findViewById(R.id.verse2_spinner).setVisibility(View.INVISIBLE);
+			findViewById(R.id.text_verse_dash).setVisibility(View.INVISIBLE);
+			findViewById(R.id.button_get_verse1).setVisibility(View.VISIBLE);
+			findViewById(R.id.button_get_verse2).setVisibility(View.INVISIBLE);
+		}
+	}
+	
+	private String newVerseUrl(){
+		String urlString = "http://gospelcoding.org/bible/?";
+		urlString += "translation=" + getTranslationPref();
+		urlString += "&book=" + currentBook.getNumber();
+		urlString += "&chapter1=" + currentChapter1;
+		urlString += "&verse1=" + currentVerse1;
+		if(multiverse){
+			urlString += "&chapter2=" + currentChapter2;
+			urlString += "&verse2=" + currentVerse2;
+		}
+		else{
+			urlString += "&chapter2=" + currentChapter1;
+			urlString += "&verse2=" + currentVerse1;
+			
+		}
+		return urlString;
+	}
+	
+//	private String newVerseUrlOld(){
+//		String urlString = "http://gospelcoding.org/bible/";
+//		urlString += getTranslation() + "/";
+//		urlString += currentBook.getWebName() + "-" + currentChapter + "-" + currentVerse;
+//		return urlString;
+//	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -146,19 +186,26 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 	}
 
 	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id){
-		switch(((View) view.getParent()).getId()){
+		switch(parent.getId()){
 		case R.id.books_spinner:
 			currentBook = (Book) parent.getItemAtPosition(pos);
-			updateChapterSpinner();
+			updateChapter1Spinner();
 			break;
-		case R.id.chapter_spinner:
-			currentChapter = (Integer) parent.getItemAtPosition(pos);
-			updateVerseSpinner();
+		case R.id.chapter1_spinner:
+			currentChapter1 = (Integer) parent.getItemAtPosition(pos);
+			updateVerse1Spinner();
+		case R.id.chapter2_spinner:
+			currentChapter2 = (Integer) parent.getItemAtPosition(pos);
+			updateVerse2Spinner();
 			break;
-		case R.id.verse_spinner:
-			currentVerse = (Integer) parent.getItemAtPosition(pos);
+		case R.id.verse1_spinner:
+			currentVerse1 = (Integer) parent.getItemAtPosition(pos);
+			updateChapter2Spinner();
+		case R.id.verse2_spinner:
+			currentVerse2 = (Integer) parent.getItemAtPosition(pos);
 		}
 		//Log.e("NewVerseActivity", "View Id: "+((View) view.getParent()).getId() + "\nSpinner Id: "+R.id.books_spinner);
+		
 	}
 	
 	@Override
@@ -176,33 +223,94 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 		//do nothing?
 	}
 	
-	private void updateChapterSpinner(){
-		int bookId = currentBook.getId();
-		int numberOfChapters = dbhelper.getNumberOfChapters(bookId);
-		List<Integer> chapterList = new ArrayList<Integer>();
-		for(int i=1; i<=numberOfChapters; ++i){
-			chapterList.add(i);
+//	private void setupTranslationsSpinner(){
+//		DbHelper dbhelper = new DbHelper(this);
+//		SQLiteDatabase db = dbhelper.getReadableDatabase();
+//		Cursor c = db.query(BunchOfTranslations.TRANSLATIONS_TABLE, null, null, null, null, 
+//				null, BunchOfTranslations.NAME_COLUMN+" ASC", null);
+//		Spinner translationSpinner = (Spinner) findViewById(R.id.translation_spinner);
+//		startManagingCursor(c);
+//		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, c, new String[]{"name"}, new int[]{android.R.id.text1});
+//		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//		translationSpinner.setAdapter(adapter);
+//		stopManagingCursor(c);
+//		c.close();
+//		db.close();
+//	}
+	
+	private void setVerseRef(){
+		verseRef = currentBook.getName() + " " + currentChapter1 + ":" + currentVerse1;
+		if(multiverse){
+			verseRef += "-";
+			if(currentChapter1 != currentChapter2){
+				verseRef += currentChapter2 + ":";
+			}
+			verseRef += currentVerse2;
 		}
-		ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, chapterList);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		
-		Spinner chapterSpinner = (Spinner) findViewById(R.id.chapter_spinner);
-		chapterSpinner.setAdapter(adapter);
-		//Log.e("Spinners", "Updating chapter spinner for book id "+bookId);
 	}
 	
-	private void updateVerseSpinner(){
+	private void updateChapter1Spinner(){
 		int bookId = currentBook.getId();
-		int numberOfVerses = dbhelper.getNumberOfVerses(bookId, currentChapter);
-		List<Integer> verseList = new ArrayList<Integer>();
-		for(int i=1; i<=numberOfVerses; ++i){
-			verseList.add(i);
-		}
-		ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, verseList);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		int numberOfChapters = dbhelper.getNumberOfChapters(bookId);
+		updateNumberSpinner(R.id.chapter1_spinner, 1, numberOfChapters);
+	}
+	
+	private void updateChapter2Spinner(){
+		//2 if within 6 verses of end of chapter and there is another chapter available
 		
-		Spinner chapterSpinner = (Spinner) findViewById(R.id.verse_spinner);
-		chapterSpinner.setAdapter(adapter);
-		//Log.e("Spinners", "Updating verse spinner for book id " + bookId + " chapter "+currentChapter);
+		int bookId = currentBook.getId();
+		int numberOfChapters = dbhelper.getNumberOfChapters(bookId);
+		int firstChapter = currentChapter1;
+		int lastChapter = currentChapter1;
+		
+		if(numberOfChapters > currentChapter1){
+			int numberOfVerses = dbhelper.getNumberOfVerses(bookId, currentChapter1);
+			if(currentVerse1 + maxVerses - 1 > numberOfVerses){
+				++lastChapter;
+				if(currentVerse1 == numberOfVerses){
+					++firstChapter;
+				}
+			}
+		}
+		updateNumberSpinner(R.id.chapter2_spinner, firstChapter, lastChapter);
+	}	
+	
+	private void updateNumberSpinner(int spinnerResource, int start, int stop){
+		List<Integer> list = new ArrayList<Integer>();
+		for(int i=start; i<=stop; ++i){
+			list.add(i);
+		}
+		ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, list);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		((Spinner) findViewById(spinnerResource)).setAdapter(adapter);
+	}
+	
+	private void updateVerse1Spinner(){
+		int bookId = currentBook.getId();
+		int numberOfChapters = dbhelper.getNumberOfChapters(bookId);
+		int numberOfVerses = dbhelper.getNumberOfVerses(bookId, currentChapter1);
+		if(multiverse && (currentChapter1 == numberOfChapters)){
+			--numberOfVerses;
+		}
+		updateNumberSpinner(R.id.verse1_spinner, 1, numberOfVerses);
+	}
+	
+	private void updateVerse2Spinner(){
+		int start = 0;
+		int stop = 0;
+		int chapter1Verses = dbhelper.getNumberOfVerses(currentBook.getId(), currentChapter1);
+		
+		if(currentChapter2 == currentChapter1){
+			start = currentVerse1 + 1;
+			stop = start + maxVerses - 1;
+			if(stop > chapter1Verses){
+				stop = chapter1Verses;
+			}
+		}
+		else{
+			start = 1;
+			stop = currentVerse1 + maxVerses - chapter1Verses - 1;
+		}
+		updateNumberSpinner(R.id.verse2_spinner, start, stop);
 	}
 }
