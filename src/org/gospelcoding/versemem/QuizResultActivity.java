@@ -27,11 +27,11 @@ public class QuizResultActivity extends Activity {
 	public static final String QUIZ_STYLE = "org.gospelcoding.versemem.quiz_style";
 	public static final String VERSE_ID = "org.gospelcoding.versemem.verse_id";
 	public static final String REFERENCE = "org.gospelcoding.versemem.reference";
-	public static final String QUIZ_ID = "org.gospelcoding.versemem.quiz_id";
+	//public static final String QUIZ_ID = "org.gospelcoding.versemem.quiz_id";
 	
 	private String quizStyle;
 	private long verseId;
-	private int quizId;
+	//private int quizId;
 	private int resultStatus = -1;
 	private boolean success;
 	private final int STATUS_SHOWING_REF = 0;
@@ -45,23 +45,17 @@ public class QuizResultActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Intent intent = getIntent();
+		quizStyle = intent.getStringExtra(QUIZ_STYLE);
+		verseId = intent.getLongExtra(VERSE_ID, -1);
+		showAnswer();
 	}
 	
 	@Override
 	public void onStart(){
 		super.onStart();
-		Intent intent = getIntent();
-		//TODO revisit this idea
-		if(quizId != intent.getIntExtra(QUIZ_ID, -1)){
-			quizId = intent.getIntExtra(QUIZ_ID, -1);
-			quizStyle = intent.getStringExtra(QUIZ_STYLE);
-			verseId = intent.getLongExtra(VERSE_ID, -1);
-			showAnswer();
-		}
-		else{
-			if(quizStyle.equals(SettingsActivity.MICROPHONE)){
-				initMediaPlayer();
-			}
+		if(quizStyle.equals(SettingsActivity.MICROPHONE)){
+			initMediaPlayer();
 		}
 	}
 	

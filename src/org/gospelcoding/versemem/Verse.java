@@ -76,7 +76,7 @@ public class Verse {
 	}
 	
 	public boolean checkAttempt(String attempt){
-		String[] bodyArray = body.split("\\s+");  //regex should greedily grab whitespace
+		String[] bodyArray = getBody().split("\\s+");  //regex should greedily grab whitespace
 		String[] attemptArray = attempt.split("\\s+");
 		int bodyIndex = 0;
 		int attemptIndex = 0;
@@ -107,7 +107,9 @@ public class Verse {
 
 	public int getAttempts(){ return attempts; }
 	
-	public String getBody(){ return body; }
+	public String getBody(){ 
+		return printableBody(body); 
+	}
 	
 	public long getId(){ return id; }
 	
@@ -203,6 +205,10 @@ public class Verse {
 		values.put(LAST_ATTEMPT_COLUMN, getLastAttemptString());
 		values.put(WEIGHT_COLUMN, weight);
 		return values;
+	}
+	
+	public static String printableBody(String s){
+		return s.replaceAll("<.*?>", "");
 	}
 	
 	public static void saveQuizResult(DbHelper dbhelper, long verseId, boolean success){

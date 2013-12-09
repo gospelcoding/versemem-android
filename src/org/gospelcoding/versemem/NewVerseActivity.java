@@ -71,7 +71,7 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 				previewVerse.setText("Sorry, that verse could not be found. (Do you have an internet connection?)");
 			}
 			else{
-				previewVerse.setText(body);
+				previewVerse.setText(Verse.printableBody(body));
 				Button addVerseButton = (Button) findViewById(R.id.button_add_verse);
 				addVerseButton.setVisibility(View.VISIBLE);
 			}

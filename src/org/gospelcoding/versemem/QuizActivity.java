@@ -28,7 +28,7 @@ public class QuizActivity extends Activity{
 	
 	private Verse quizVerse;
 	private String quizStyle;
-	private int quizId;
+	//private int quizId;
 	
 	//for microphone quiz
 	private boolean recordingNow = false;
@@ -37,7 +37,7 @@ public class QuizActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		quizId = (new DbHelper(this)).getQuizId();
+		//quizId = (new DbHelper(this)).getQuizId();
 		displayQuiz();
 	}
 	
@@ -157,7 +157,7 @@ public class QuizActivity extends Activity{
 		intent.putExtra(QuizResultActivity.VERSE_BODY, quizVerse.getBody());
 		intent.putExtra(QuizResultActivity.QUIZ_STYLE, quizStyle);
 		intent.putExtra(QuizResultActivity.VERSE_ID, quizVerse.getId());
-		intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
+		//intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
 		if(quizStyle.equals(SettingsActivity.KEYBOARD_AUTO)){
 			boolean result = quizVerse.checkAttempt(attempt);
 			intent.putExtra(QuizResultActivity.SUCCESS, result);
@@ -172,7 +172,7 @@ public class QuizActivity extends Activity{
 		intent.putExtra(QuizResultActivity.VERSE_BODY, quizVerse.getBody());
 		intent.putExtra(QuizResultActivity.QUIZ_STYLE, quizStyle);
 		intent.putExtra(QuizResultActivity.VERSE_ID, quizVerse.getId());
-		intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
+		//intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
 		startActivity(intent);
 		finish();
 	}
@@ -183,7 +183,7 @@ public class QuizActivity extends Activity{
 		intent.putExtra(QuizResultActivity.VERSE_BODY, quizVerse.getBody());
 		intent.putExtra(QuizResultActivity.QUIZ_STYLE, quizStyle);
 		intent.putExtra(QuizResultActivity.VERSE_ID, quizVerse.getId());
-		intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
+		//intent.putExtra(QuizResultActivity.QUIZ_ID, quizId);
 		startActivity(intent);
 		finish();
 	}
