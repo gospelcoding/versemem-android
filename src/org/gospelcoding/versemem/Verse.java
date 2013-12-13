@@ -17,8 +17,8 @@ public class Verse {
 	public static final String TAG = "Verse";
 	
 	public static final int STATUS_LEARNING = 0;
-	public static final int STATUS_MASTERED = 1;
-	public static final int STATUS_REFRESHING = 2;
+	public static final int STATUS_MASTERED = 2;
+	public static final int STATUS_REFRESHING = 1;
 	public static final int STREAK_TYPE_RIGHT = 0;
 	public static final int STREAK_TYPE_WRONG = 1;
 	
@@ -33,6 +33,23 @@ public class Verse {
 	public static final String STREAK_TYPE_COLUMN = "streak_type";
 	public static final String LAST_ATTEMPT_COLUMN = "last_attempt";
 	public static final String WEIGHT_COLUMN = "weight";
+	
+	public static final int LEARNING_TO_MASTERED = 7;
+	public static final int REFRESHING_TO_MASTERED = 3;
+	public static final int REFRESHING_TO_LEARNING = 3;
+	public static final int TRULY_MASTERED = 50;
+	
+//	public static final int RVAL1 = 216;
+//	public static final int GVAL1 = 247;
+//	public static final int BVAL1 = 129;
+//	public static final int RVAL2 = 4;
+//	public static final int GVAL2 = 180;
+//	public static final int BVAL2 = 49;
+	
+	public static final String GREEN1_STRING = "#D8F781";
+	public static final String GREEN2_STRING = "#04B431";
+	public static final int[] GREEN1 = new int[]{216, 247, 129};
+	public static final int[] GREEN2 = new int[]{4, 180, 49};
 
 	//private variables
 	//DbHelper dbhelper;
@@ -125,6 +142,53 @@ public class Verse {
 	
 	public String getLastAttemptString(){
 		return lastAttempt.getYear() + "-" + lastAttempt.getMonthOfYear() + "-" + lastAttempt.getDayOfMonth();
+	}
+	
+	public double getProgress(){
+		if(streakType == STREAK_TYPE_WRONG) return 0;
+		switch(status){
+		case STATUS_LEARNING:
+			return (1.0 * streak) / LEARNING_TO_MASTERED;
+		case STATUS_REFRESHING:
+			return (1.0 * streak) / REFRESHING_TO_MASTERED;
+		case STATUS_MASTERED:
+			return 1;
+		}
+		Log.e("VerseMem: Verse", "omg, Verse.getProgress() did not return an answer!!!");
+		return 0.5;
+	}
+	
+	public String getProgressColor(){
+		if(status != STATUS_MASTERED){
+			return GREEN1_STRING;
+		}
+		if(streak >= TRULY_MASTERED){
+			return GREEN2_STRING;
+		}
+
+		String color = "#";
+		for(int i=0; i<3; ++i){
+			int c = ((GREEN2[i] - GREEN1[i]) * streak) / TRULY_MASTERED + GREEN1[i]; 
+			color += Integer.toHexString(c);
+		}
+		return color;
+	}
+	
+	public String getProgressText(){
+		String s = "";
+		if(streakType == STREAK_TYPE_WRONG){
+			s += "0";
+		}
+		else{
+			s += streak;
+		}
+		
+		if(status == STATUS_LEARNING)
+			s += "/7";
+		if(status == STATUS_REFRESHING)
+			s += "/3";
+		
+		return s;
 	}
 	
 	public static Verse getQuizVerse(DbHelper dbhelper, long id){
@@ -233,10 +297,10 @@ public class Verse {
 			
 			switch(status){
 			case STATUS_LEARNING:
-				if(streak >= 7) status = STATUS_MASTERED;
+				if(streak >= LEARNING_TO_MASTERED) status = STATUS_MASTERED;
 				break;
 			case STATUS_REFRESHING:
-				if(streak >= 3) status = STATUS_MASTERED;
+				if(streak >= REFRESHING_TO_MASTERED) status = STATUS_MASTERED;
 			}
 		}
 		
@@ -252,7 +316,7 @@ public class Verse {
 			
 			switch(status){
 			case STATUS_REFRESHING:
-				if(streak >= 3) status = STATUS_LEARNING;
+				if(streak >= REFRESHING_TO_LEARNING) status = STATUS_LEARNING;
 				break;
 			case STATUS_MASTERED:
 				status = STATUS_REFRESHING;

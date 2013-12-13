@@ -76,7 +76,7 @@ public class VerseListActivity extends ListActivity {
 	private void showList(){
 		DbHelper dbhelper = new DbHelper(this);
 		List<Verse> verses = dbhelper.getAllVerses();
-		ArrayAdapter<Verse> adapter = new ArrayAdapter<Verse>(this, android.R.layout.simple_list_item_1, verses);
+		VerseListArrayAdapter adapter = new VerseListArrayAdapter(this, verses);
 		setListAdapter(adapter);	
 		if(verses.size() == 0){
 			getNewVerse();
