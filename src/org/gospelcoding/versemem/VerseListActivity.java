@@ -23,12 +23,17 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 
 
 public class VerseListActivity extends ListActivity {
 	public static final String TAG = "VerseListActivity";
+	
+	private VerseListArrayAdapter adapter;
 			
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +46,24 @@ public class VerseListActivity extends ListActivity {
 	@Override
 	protected void onStart(){
 		super.onStart();
-		showList();
+		
+		DbHelper dbhelper = new DbHelper(this);
+		List<Verse> verses = dbhelper.getAllVerses();
+		if(verses.size()==0) getNewVerse();
+		adapter = new VerseListArrayAdapter(this, verses);
+		setListAdapter(adapter);
+	}
+	
+	public void cancelEdit(View v){
+		adapter.cancelEdit();
+	}
+	
+	public void deleteVerse(View v){
+		adapter.deleteSelectedItem();
+	}
+	
+	public void editVerse(View v){
+		adapter.editSelectedItem();
 	}
 	
 	public void getNewVerse(){
@@ -54,6 +76,11 @@ public class VerseListActivity extends ListActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.list_activity_actions, menu);
 		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	protected void onListItemClick(ListView listview, View v, int position, long id){
+		adapter.setSelectedItem(position);
 	}
 	
 	@Override
@@ -73,14 +100,9 @@ public class VerseListActivity extends ListActivity {
 		}
 	}
 	
-	private void showList(){
-		DbHelper dbhelper = new DbHelper(this);
-		List<Verse> verses = dbhelper.getAllVerses();
-		VerseListArrayAdapter adapter = new VerseListArrayAdapter(this, verses);
-		setListAdapter(adapter);	
-		if(verses.size() == 0){
-			getNewVerse();
-		}
+	public void saveVerse(View v){
+		String newBody = ((EditText) findViewById(R.id.edit_text_verse_body)).getText().toString();
+		adapter.saveEdit(newBody);
 	}
 
 	private void startQuiz(){

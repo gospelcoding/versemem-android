@@ -2,6 +2,10 @@
 <resources>
 
     <string name="app_name">Verse Mem</string>
+    <string name="edit_verse_button">Edit</string>
+    <string name="delete_verse_button">Delete</string>
+    <string name="save_button">Save</string>
+    <string name="cancel_button">Cancel</string>
     <string name="action_quiz">Quiz</string>
     <string name="title_activity_quiz">QuizActivity</string>
     <string name="record_button">Record</string>

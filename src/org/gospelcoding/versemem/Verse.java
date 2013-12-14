@@ -121,6 +121,26 @@ public class Verse {
 		
 		return true;
 	}
+	
+	public void delete(DbHelper dbhelper){
+		SQLiteDatabase db = dbhelper.getWritableDatabase();
+		db.delete(VERSES_TABLE, ID_COLUMN+"="+id, null);
+		db.close();
+	}
+	
+	/* Does not work with merged verses! */
+	public void editBody(String newBody, DbHelper dbhelper){
+		newBody = newBody.replaceAll("[<>]", "");
+		String tag = body.substring(0, body.indexOf('>')+1);
+		newBody = tag + newBody;
+		ContentValues vals = new ContentValues();
+		vals.put(BODY_COLUMN, newBody);
+		SQLiteDatabase db = dbhelper.getWritableDatabase();
+		db.update(VERSES_TABLE, vals, ID_COLUMN+"="+id, null);
+		db.close();
+		body = newBody;
+		Log.e("Verse", "New Verse Body: "+body);
+	}
 
 	public int getAttempts(){ return attempts; }
 	

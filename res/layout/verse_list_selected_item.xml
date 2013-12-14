@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:orientation="vertical" >
+    
+	<RelativeLayout
+	    android:id="@+id/layout_normal_list_item"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" >
+	    
+		<TextView
+		    android:id="@+id/text_progress_bar"
+			style="@android:style/TextAppearance.Large"
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent" 
+		    android:layout_alignParentTop="true"
+		    android:layout_alignParentLeft="true"
+		    android:paddingTop="16dp"
+		    android:paddingBottom="16dp"
+		    android:background="#D8F781"
+		    android:text=" " />
+	   
+		<TextView
+		    android:id="@+id/text_verse_ref"
+		    style="@android:style/TextAppearance.Large"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+		    android:layout_alignParentTop="true"
+		    android:layout_alignParentLeft="true"
+			android:paddingTop="8dp"
+		   	android:paddingBottom="8dp"
+			android:background="#00FFFFFF" />
+			    
+		<TextView
+			android:id="@+id/text_verse_status"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+		    android:layout_alignParentTop="true"
+		    android:layout_alignParentRight="true"
+			android:paddingTop="8dp"
+			android:paddingBottom="8dp"
+			android:gravity="end"
+			android:background="#00FFFFFF"  />
+	</RelativeLayout>
+	
+	<TextView
+	    android:id="@+id/text_verse_body"
+	    android:layout_width="match_parent" 
+	    android:layout_height="wrap_content"
+	    android:paddingBottom="8dp"
+	    android:text="" />
+	
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"  >
+	    
+	    <Button 
+	        android:id="@+id/button_edit_verse"
+	        android:layout_height="wrap_content"
+	        android:layout_width="0dp"
+	        android:layout_weight="1"
+	        android:text="@string/edit_verse_button"
+	        android:onClick="editVerse" />
+	    
+	    <Button 
+	        android:id="@+id/button_delete_verse"
+	        android:layout_height="wrap_content"
+	        android:layout_width="0dp"
+	        android:layout_weight="1"
+	        android:text="@string/delete_verse_button"
+	        android:onClick="deleteVerse" />
+	    
+	</LinearLayout>
+</LinearLayout>
