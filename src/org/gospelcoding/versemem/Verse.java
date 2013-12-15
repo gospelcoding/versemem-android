@@ -139,7 +139,7 @@ public class Verse {
 		db.update(VERSES_TABLE, vals, ID_COLUMN+"="+id, null);
 		db.close();
 		body = newBody;
-		Log.e("Verse", "New Verse Body: "+body);
+		//Log.e("Verse", "New Verse Body: "+body);
 	}
 
 	public int getAttempts(){ return attempts; }

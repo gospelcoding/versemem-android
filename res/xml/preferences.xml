@@ -16,17 +16,20 @@
     <CheckBoxPreference 
         android:key="pref_notification_vibrate"
         android:title="@string/pref_notification_vibrate"
-        android:defaultValue="false"/>
+        android:defaultValue="false"
+        android:order="7" />
     <CheckBoxPreference 
         android:key="pref_notification_led"
         android:title="@string/pref_notification_led"
-        android:defaultValue="false"/>
+        android:defaultValue="false"
+        android:order="8" />
     <ListPreference 
         android:key="pref_quiz_style"
         android:title="@string/pref_quiz_style"
         android:entries="@array/pref_quiz_styles"
         android:entryValues="@array/pref_quiz_styles"
-        android:defaultValue="@string/pref_quiz_style_default" />
+        android:defaultValue="@string/pref_quiz_style_default"
+        android:order="9"  />
 <!--     <CheckBoxPreference -->
 <!--         android:key="pref_auto_merge" -->
 <!--         android:title="@string/pref_auto_merge" -->

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
 
@@ -50,10 +51,31 @@ public class TimePreference extends DialogPreference {
         return(Integer.parseInt(pieces[0]));
     }
 
+    public int getHour(){
+    	return lastHour;
+    }
+    
     public static int getMinute(String time) {
         String[] pieces=time.split(":");
 
         return(Integer.parseInt(pieces[1]));
+    }
+    
+    public int getMinute(){
+    	return lastMinute;
+    }
+
+//    public boolean isBefore(TimePreference pref2){
+//    	Log.e("TP", "Comparing "+lastHour+":"+lastMinute+", "+pref2.getHour()+":"+pref2.getMinute());
+//    	if(lastHour == pref2.getHour())
+//    		return (lastMinute < pref2.getMinute());
+//    	return (lastHour < pref2.getHour());
+//    }
+    
+    public boolean isBefore(String time2){
+    	if(lastHour == getHour(time2))
+    		return (lastMinute < getMinute(time2));
+    	return (lastHour < getHour(time2));
     }
 
     @Override

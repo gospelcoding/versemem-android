@@ -38,7 +38,7 @@ public abstract class QuizMaster {
 	}
 
 	public static void setNextAlarm(Context context){
-		Log.e("QuizMaster", "Set Next alarm");
+		//Log.e("QuizMaster", "Set Next alarm");
 		AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		DateTime nextAlarm = getNextAlarm(prefs);
@@ -53,6 +53,6 @@ public abstract class QuizMaster {
 		}
 		mAlarmManager.cancel(notifyPendingIntent);
 		mAlarmManager.set(alarmType, nextAlarm.getMillis(), notifyPendingIntent);
-		Log.e("QuizMaster", "Alrm: "+nextAlarm.getHourOfDay() + ":" + nextAlarm.getMinuteOfHour());
+		//Log.e("QuizMaster", "Alrm: "+nextAlarm.getHourOfDay() + ":" + nextAlarm.getMinuteOfHour());
 	}
 }

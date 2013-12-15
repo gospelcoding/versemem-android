@@ -20,7 +20,7 @@ import android.widget.BaseAdapter;
 
 public class SettingsActivity extends PreferenceActivity 
 								implements OnSharedPreferenceChangeListener{
-	public static final int NOTIFICATION_TIME_ORDER = 2;
+	public static final int FIRST_NOTIFICATION_TIME_ORDER = 2;
 	public static final String PREF_NOTIFICATION_NUMBER = "pref_notification_number";
 	public static final String PREF_NOTIFICATION_TIME = "pref_notification_time_";
 	public static final String PREF_NOTIFICATION_VIBRATE = "pref_notification_vibrate";
@@ -33,6 +33,7 @@ public class SettingsActivity extends PreferenceActivity
 	public static final String MICROPHONE = "Microphone Self-Check";
 	public static final String NO_INPUT = "No Input";
 	public static final String DEFAULT_QUIZ_STYLE = KEYBOARD_AUTO; 
+	
 	private int oldNumberOfNotifications;
 
 	@SuppressWarnings("deprecation")
@@ -54,14 +55,22 @@ public class SettingsActivity extends PreferenceActivity
 	@SuppressWarnings("deprecation")
 	public void addTimePreference(int index){
 		TimePreference timePref = new TimePreference(this, null);
-		timePref.setOrder(NOTIFICATION_TIME_ORDER);
 		timePref.setKey(PREF_NOTIFICATION_TIME + index);
 		timePref.setDefaultValue("12:00");
 		SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
-		String title = prefs.getString(PREF_NOTIFICATION_TIME + index, "12:00");
-		timePref.setTitle(printableTime(title));
+		String time = prefs.getString(PREF_NOTIFICATION_TIME + index, "12:00");
+		timePref.setTitle(printableTime(time));
 
 		PreferenceScreen prefScreen = getPreferenceScreen();
+		int order = FIRST_NOTIFICATION_TIME_ORDER;
+		while(order < FIRST_NOTIFICATION_TIME_ORDER+index
+				&& ((TimePreference) prefScreen.getPreference(order)).isBefore(time)){
+			++order;
+		}
+		for(int i=order; i<FIRST_NOTIFICATION_TIME_ORDER+index; ++i){
+			prefScreen.getPreference(i).setOrder(i+1);
+		}
+		timePref.setOrder(order);
 		prefScreen.addPreference(timePref);
 		
 	}
@@ -78,16 +87,16 @@ public class SettingsActivity extends PreferenceActivity
 		}
 		else if(changeInNumberOfNotifications < 0){
 			changeInNumberOfNotifications *= -1;
-			for(int i=0; i<changeInNumberOfNotifications; ++i){
-				dropTimePreference();
+			for(int i=oldNumberOfNotifications-1; i>=numberOfNotifications; --i){
+				dropTimePreference(i);
 			}
 		}
 		oldNumberOfNotifications = numberOfNotifications;
 	}
 	
-	public void dropTimePreference(){
+	public void dropTimePreference(int index){
 		PreferenceScreen prefScreen = getPreferenceScreen();
-		prefScreen.removePreference(prefScreen.getPreference(NOTIFICATION_TIME_ORDER));
+		prefScreen.removePreference(prefScreen.findPreference(PREF_NOTIFICATION_TIME+index));
 	}
 	
 	@Override
