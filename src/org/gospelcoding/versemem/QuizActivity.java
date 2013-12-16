@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +40,17 @@ public class QuizActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		//quizId = (new DbHelper(this)).getQuizId();
 		displayQuiz();
+	}
+	
+	@Override
+	protected void onStop(){
+		super.onStop();
+		if(recordingNow){
+			stopRecording();
+			displayQuizMicrophone();
+			recordingNow = false;
+			Log.e("QuizActivity", "onStop!");
+		}
 	}
 	
 	private void displayQuiz(){
@@ -90,6 +102,11 @@ public class QuizActivity extends Activity{
 	public static String getRecordingFilepath(){
 		return Environment.getExternalStorageDirectory().getAbsolutePath() + "/versemem";
 	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig){
+		super.onConfigurationChanged(newConfig);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -113,6 +130,7 @@ public class QuizActivity extends Activity{
 		if(recordingNow){
 			stopRecording();
 			setContentView(R.layout.quiz_microphone_recorded);
+			((TextView) findViewById(R.id.quiz_text)).setText(quizVerse.getReference());
 		}
 		else{
 			startRecording();
