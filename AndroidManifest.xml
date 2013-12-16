@@ -41,6 +41,7 @@
         </activity>
         <activity
             android:name="org.gospelcoding.versemem.NewVerseActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_new_verse" >
         </activity>
         <activity

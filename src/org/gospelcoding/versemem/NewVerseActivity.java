@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -47,6 +48,8 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 	private boolean multiverse = false;
 	private int maxVerses = 6;
 	
+	private boolean showingVerse = false;
+	
 	private class DownloadVerseTask extends AsyncTask<URL, Void, String> {
 		@Override
 		protected String doInBackground(URL... urls) {
@@ -74,6 +77,7 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 				previewVerse.setText(Verse.printableBody(body));
 				Button addVerseButton = (Button) findViewById(R.id.button_add_verse);
 				addVerseButton.setVisibility(View.VISIBLE);
+				showingVerse = true;
 			}
 		}
 	}
@@ -125,6 +129,7 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		((TextView) findViewById(R.id.text_preview_verse)).setText("...");
 	}
 	
 	public String getTranslationPref(){
@@ -169,6 +174,17 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 			
 		}
 		return urlString;
+	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig){
+		super.onConfigurationChanged(newConfig);
+		
+		multiverseCheckbox(findViewById(R.id.checkbox_multiverse));
+		if(showingVerse){
+			((TextView) findViewById(R.id.text_preview_verse)).setText(Verse.printableBody(verseBody));
+			findViewById(R.id.button_add_verse).setVisibility(View.VISIBLE);
+		}
 	}
 	
 //	private String newVerseUrlOld(){
