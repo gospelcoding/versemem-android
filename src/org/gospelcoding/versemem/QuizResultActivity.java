@@ -31,6 +31,7 @@ public class QuizResultActivity extends Activity {
 	
 	private String quizStyle;
 	private long verseId;
+	private int postQuizStreak = -1;
 	//private int quizId;
 	private int resultStatus = -1;
 	private boolean success;
@@ -48,6 +49,7 @@ public class QuizResultActivity extends Activity {
 		Intent intent = getIntent();
 		quizStyle = intent.getStringExtra(QUIZ_STYLE);
 		verseId = intent.getLongExtra(VERSE_ID, -1);
+		setTitle(intent.getStringExtra(REFERENCE));
 		showAnswer();
 	}
 	
@@ -97,7 +99,7 @@ public class QuizResultActivity extends Activity {
 			findViewById(R.id.button_right).setVisibility(View.INVISIBLE);
 			findViewById(R.id.button_wrong).setVisibility(View.INVISIBLE);
 			if(success){
-				((TextView) findViewById(R.id.quiz_result_text)).setText(R.string.quiz_success);
+				((TextView) findViewById(R.id.quiz_result_text)).setText(successString());
 				findViewById(R.id.button_new_quiz).setVisibility(View.VISIBLE);
 			}
 			else{
@@ -192,7 +194,7 @@ public class QuizResultActivity extends Activity {
 	
 	public void saveResult(boolean success){
 		DbHelper dbhelper = new DbHelper(this);
-		Verse.saveQuizResult(dbhelper, verseId, success);
+		postQuizStreak = Verse.saveQuizResult(dbhelper, verseId, success);
 	}
 	
 	public void showAnswer(){
@@ -244,7 +246,7 @@ public class QuizResultActivity extends Activity {
 		setContentView(R.layout.quiz_result_success);
 		String verseBody = getIntent().getStringExtra(VERSE_BODY);
 		TextView resultText = (TextView) findViewById(R.id.quiz_result_text);
-		resultText.setText(getString(R.string.quiz_success) + "\n\n" + verseBody);
+		resultText.setText(successString() + "\n\n" + verseBody);
 	}
 	
 	
@@ -281,4 +283,7 @@ public class QuizResultActivity extends Activity {
 		adjustView();
 	}
 
+	private String successString(){
+		return getString(R.string.quiz_success) + " " + postQuizStreak + " " + getString(R.string.in_a_row);
+	}
 }

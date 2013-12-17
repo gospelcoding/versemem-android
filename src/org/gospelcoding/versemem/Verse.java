@@ -295,12 +295,12 @@ public class Verse {
 		return s.replaceAll("<.*?>", "");
 	}
 	
-	public static void saveQuizResult(DbHelper dbhelper, long verseId, boolean success){
+	public static int saveQuizResult(DbHelper dbhelper, long verseId, boolean success){
 		Verse v = getVerse(dbhelper, verseId);
-		v.saveQuizResult(success, dbhelper);
+		return v.saveQuizResult(success, dbhelper);
 	}
 	
-	public void saveQuizResult(boolean success, DbHelper dbhelper){
+	public int saveQuizResult(boolean success, DbHelper dbhelper){
 		++attempts;
 		lastAttempt = LocalDate.now();
 		if(success){
@@ -346,8 +346,8 @@ public class Verse {
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		db.update(VERSES_TABLE, values, getIdWhereClause(id), null);
 		db.close();
-		
 		Verse.weighterMax(dbhelper);
+		return streak;
 	}
 	
 	public static void setBlitzWeights(long blitzId, DbHelper dbhelper){

@@ -61,6 +61,7 @@ public class QuizActivity extends Activity{
 		else{
 			quizVerse = Verse.getQuizVerse(new DbHelper(this));
 		}
+		setTitle(quizVerse.getReference());
 		quizStyle = PreferenceManager.getDefaultSharedPreferences(this)
 				.getString(SettingsActivity.PREF_QUIZ_STYLE, SettingsActivity.DEFAULT_QUIZ_STYLE);
 		
@@ -137,6 +138,10 @@ public class QuizActivity extends Activity{
 			((Button) findViewById(R.id.button_record)).setText(R.string.stop_recording);
 		}
 		recordingNow = !recordingNow;
+	}
+	
+	public void rerecord(View v){
+		displayQuizMicrophone();
 	}
 	
 	public void startRecording(){

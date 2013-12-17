@@ -5,6 +5,7 @@
     
     <TextView
         android:id="@+id/quiz_text"
+	    style="@android:style/TextAppearance.Medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -17,11 +18,11 @@
         android:orientation="horizontal" >
         
 	    <Button
-	        android:id="@+id/button_record"
+	        android:id="@+id/button_rerecord"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/rerecord_button"
-	        android:onClick="recordAttempt" />
+	        android:onClick="rerecord" />
 	    
 	    <Button
 	        android:id="@+id/submit_quiz"
