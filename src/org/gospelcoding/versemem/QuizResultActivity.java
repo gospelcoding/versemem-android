@@ -200,9 +200,9 @@ public class QuizResultActivity extends Activity {
 	public void showAnswer(){
 		if(quizStyle.equals(SettingsActivity.KEYBOARD_AUTO)){
 			success = getIntent().getBooleanExtra(SUCCESS, false);
+			saveResult(success);
 			if(success) showAnswerSuccess();
 			else showAnswerFailure();
-			saveResult(success);
 		}
 		else if(quizStyle.equals(SettingsActivity.KEYBOARD_SELF)){
 			showAnswerKeyboard();
