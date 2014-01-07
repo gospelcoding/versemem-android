@@ -361,6 +361,7 @@ public class Verse {
 		
 		db.update(VERSES_TABLE, blitzWeight, getIdWhereClause(blitzId), null);
 		db.update(VERSES_TABLE, zeroWeights, ID_COLUMN + " <> " + blitzId, null);	
+		db.close();
 	}
 	
 	public static void weighterMax(DbHelper dbhelper){
