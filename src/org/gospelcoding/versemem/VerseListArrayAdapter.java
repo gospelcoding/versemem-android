@@ -17,7 +17,8 @@ public class VerseListArrayAdapter extends ArrayAdapter<Verse> {
 	private Context context;
 	private List<Verse> verses;
 	private int selectedItem;
-	private boolean editingSelected = false;
+	//private boolean editingSelected = false;
+	//private String editingText = null;
 	
 	public VerseListArrayAdapter(Context context, List<Verse> verses){
 		super(context, R.layout.verse_list_item, verses);
@@ -26,10 +27,10 @@ public class VerseListArrayAdapter extends ArrayAdapter<Verse> {
 		this.selectedItem = -1; //nothing is selected yet
 	}
 	
-	public void cancelEdit(){
-		editingSelected = false;
-		notifyDataSetChanged();
-	}
+//	public void cancelEdit(){
+//		editingSelected = false;
+//		notifyDataSetChanged();
+//	}
 	
 	public void deleteSelectedItem(){
 		verses.get(selectedItem).delete(new DbHelper(context));
@@ -38,10 +39,10 @@ public class VerseListArrayAdapter extends ArrayAdapter<Verse> {
 		notifyDataSetChanged();
 	}
 	
-	public void editSelectedItem(){
-		editingSelected = true;
-		notifyDataSetChanged();
-	}
+//	public void editSelectedItem(){
+//		editingSelected = true;
+//		notifyDataSetChanged();
+//	}
 	
 	private View fillOutNormalPart(View rowView, Verse v, ViewGroup parent){
 		TextView verseRef = (TextView) rowView.findViewById(R.id.text_verse_ref);
@@ -55,21 +56,37 @@ public class VerseListArrayAdapter extends ArrayAdapter<Verse> {
 		return rowView;
 	}
 	
-	public View getEditSelectedView(int position, ViewGroup parent){
-		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View rowView = inflater.inflate(R.layout.verse_list_edit_selected_item, parent, false);
-		Verse v = verses.get(position);
-		rowView = fillOutNormalPart(rowView, v, parent);
-		EditText verseBody = (EditText) rowView.findViewById(R.id.edit_text_verse_body);
-		verseBody.setText(v.getBody());
-		return rowView;
-	}
+//	public View getEditSelectedView(int position, ViewGroup parent){
+//		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//		View rowView = inflater.inflate(R.layout.verse_list_edit_selected_item, parent, false);
+//		Verse v = verses.get(position);
+//		rowView = fillOutNormalPart(rowView, v, parent);
+//		EditText verseBody = (EditText) rowView.findViewById(R.id.edit_text_verse_body);
+//		if(editingText != null){
+//			verseBody.setText(editingText);
+//			editingText = null;
+//		}
+//		else{
+//			verseBody.setText(v.getBody());
+//		}
+//		verseBody.requestFocus();
+//		return rowView;
+//	}
 	
 	public View getNormalView(int position, ViewGroup parent){
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = inflater.inflate(R.layout.verse_list_item, parent, false);
 		Verse v = verses.get(position);
 		return fillOutNormalPart(rowView, v, parent);	
+	}
+	
+	public Verse getSelectedVerse(){
+		if(selectedItem >= 0){
+			return verses.get(selectedItem);
+		}
+		else{
+			return null;
+		}
 	}
 	
 	public View getSelectedView(int position, ViewGroup parent){
@@ -84,22 +101,25 @@ public class VerseListArrayAdapter extends ArrayAdapter<Verse> {
 	
 	public View getView(int position, View convertView, ViewGroup parent){
 		if(position == selectedItem){
-			if(editingSelected) return getEditSelectedView(position, parent);
-			else return getSelectedView(position, parent);
+			return getSelectedView(position, parent);
 		}
 		else{
 			return getNormalView(position, parent);
 		}
 	}
 	
+	public void orientationChanged(){
+		notifyDataSetChanged();
+	}
+	
 	public void saveEdit(String newBody){
 		verses.get(selectedItem).editBody(newBody, new DbHelper(context));
-		editingSelected = false;
+//		editingSelected = false;
 		notifyDataSetChanged();
 	}
 	
 	public void setSelectedItem(int position){
-		editingSelected = false;
+//		editingSelected = false;
 		if(position == selectedItem){
 			selectedItem = -1;
 		}

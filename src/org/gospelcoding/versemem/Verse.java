@@ -268,6 +268,7 @@ public class Verse {
 		ContentValues values = getInsertValues();
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		long verseId = db.insert(Verse.VERSES_TABLE, null, values);
+		db.close();
 		setBlitzWeights(verseId, dbhelper);
 		return verseId;
 	}

@@ -11,13 +11,16 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -54,21 +57,68 @@ public class VerseListActivity extends ListActivity {
 		setListAdapter(adapter);
 	}
 	
-	public void cancelEdit(View v){
-		adapter.cancelEdit();
-	}
+//	public void cancelEdit(View v){
+//		adapter.cancelEdit();
+//	}
 	
-	public void deleteVerse(View v){
+	private void deleteVerse(){
 		adapter.deleteSelectedItem();
 	}
 	
-	public void editVerse(View v){
-		adapter.editSelectedItem();
+	public void deleteVerseButton(View v){
+		//Display "Are you sure?" dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.delete_dialog).setTitle(adapter.getSelectedVerse().getReference());
+		builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id){
+				deleteVerse();
+			}
+		});
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
+			public void onClick(DialogInterface dialog, int id){
+				//cancel deletion - do nothing
+			}
+		});
+		AlertDialog dialog = builder.create();
+		dialog.show();
+	}
+	
+	public void editVerse(String newBody){
+		adapter.saveEdit(newBody);
+	}
+	
+	public void editVerseButton(View v){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(adapter.getSelectedVerse().getReference());
+		final EditText editVerseBody = new EditText(this);
+		editVerseBody.setText(adapter.getSelectedVerse().getBody());
+		builder.setView(editVerseBody);
+		builder.setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id){
+				editVerse(editVerseBody.getText().toString());
+			}
+		});
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
+			public void onClick(DialogInterface dialog, int id){
+				//cancel edit - do nothing
+			}
+		});
+		AlertDialog dialog = builder.create();
+		dialog.show();
+		
 	}
 	
 	public void getNewVerse(){
 		Intent intent = new Intent(this, NewVerseActivity.class);
 		startActivity(intent);
+	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig){
+//		EditText editVerseBody = (EditText) findViewById(R.id.edit_text_verse_body);
+//		adapter.prepareOrientationChange(editVerseBody);
+		super.onConfigurationChanged(newConfig);
+		adapter.orientationChanged();
 	}
 	
 	@Override
