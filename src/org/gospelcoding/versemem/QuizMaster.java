@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +17,9 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.BaseAdapter;
 
-public abstract class QuizMaster {
+public class QuizMaster extends BroadcastReceiver{
+	
+	public static final String ANDROID_BOOT_INTENT = "android.intent.action.BOOT_COMPLETED";
 	
 	public static DateTime getNextAlarm(SharedPreferences prefs){
 		int numAlarms = Integer.parseInt(prefs.getString(SettingsActivity.PREF_NOTIFICATION_NUMBER, "1"));
@@ -35,6 +38,12 @@ public abstract class QuizMaster {
 			}
 		}	
 		return nextAlarm;
+	}
+	
+	public void onReceive(Context context, Intent intent){
+		if(intent.getAction().equals(ANDROID_BOOT_INTENT)){
+			setNextAlarm(context);
+		}
 	}
 
 	public static void setNextAlarm(Context context){
