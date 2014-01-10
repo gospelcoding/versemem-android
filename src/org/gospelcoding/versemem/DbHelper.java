@@ -89,9 +89,35 @@ public class DbHelper extends SQLiteAssetHelper {
 		return chapters;
 	}
 	
+	public int getNumberOfChapters(String bookName){
+		SQLiteDatabase db = getReadableDatabase();
+		String sql = "SELECT "+NUMBER_OF_CHAPTERS_COLUMN+" FROM "+CHAPTER_NUMS_TABLE+" INNER JOIN "+Book.BOOKS_TABLE+" ON "+
+				CHAPTER_NUMS_TABLE+"."+BOOK_ID_COLUMN+"="+Book.BOOKS_TABLE+"."+Book.ID_COLUMN+" WHERE "+Book.BOOKS_TABLE+
+				"."+Book.NAME_COLUMN+"=? LIMIT 1";
+		Cursor c = db.rawQuery(sql, new String[]{bookName});
+		c.moveToFirst();
+		int chapters = c.getInt(0);
+		c.close();
+		db.close();
+		return chapters;
+	}
+	
 	public int getNumberOfVerses(int bookId, int chapter){
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor c = db.query(VERSE_NUMS_TABLE, new String[]{NUMBER_OF_VERSES_COLUMN}, BOOK_ID_COLUMN+"="+bookId+" and "+CHAPTER_COLUMN+"="+chapter, null, null, null, null, "1");
+		c.moveToFirst();
+		int verses = c.getInt(0);
+		c.close();
+		db.close();
+		return verses;
+	}
+	
+	public int getNumberOfVerses(String bookName, int chapter){
+		SQLiteDatabase db = getReadableDatabase();
+		String sql = "SELECT "+NUMBER_OF_VERSES_COLUMN+" FROM "+VERSE_NUMS_TABLE+" INNER JOIN "+Book.BOOKS_TABLE+" ON "+
+				VERSE_NUMS_TABLE+"."+BOOK_ID_COLUMN+"="+Book.BOOKS_TABLE+"."+Book.ID_COLUMN+" WHERE "+Book.BOOKS_TABLE+
+				"."+Book.NAME_COLUMN+"=? AND "+VERSE_NUMS_TABLE+"."+CHAPTER_COLUMN+"=? LIMIT 1";
+		Cursor c = db.rawQuery(sql, new String[]{bookName, Integer.toString(chapter)});
 		c.moveToFirst();
 		int verses = c.getInt(0);
 		c.close();

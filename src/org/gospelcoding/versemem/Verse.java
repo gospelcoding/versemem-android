@@ -1,5 +1,6 @@
 package org.gospelcoding.versemem;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -53,17 +54,106 @@ public class Verse {
 
 	//private variables
 	//DbHelper dbhelper;
-	long id;
-	String reference;
-	String body;
-	int status;
-	int right;
-	int attempts;
-	int streak;
-	int streakType;
-	LocalDate lastAttempt;
-	float weight;
+	private long id;
+	private String reference;
+	private String body;
+	private int status;
+	private int right;
+	private int attempts;
+	private int streak;
+	private int streakType;
+	private LocalDate lastAttempt;
+	private float weight;
+	private int[] mergeVerses = null;
 	
+	public class Reference{
+		public String book;
+		public int chapter1;
+		public int chapter2;
+		public int verse1;
+		public int verse2;
+		
+		public Reference(){
+			book = "";
+			chapter1 = chapter2 = verse1 = verse2 = 0;
+		}
+		
+		public Reference(String ref){
+			int spaceIndex = ref.indexOf(' ');
+			int colon1Index = ref.indexOf(':');
+			int dashIndex = ref.indexOf('-');
+			int colon2Index = ref.indexOf(':', colon1Index+1);
+			
+			book = ref.substring(0, spaceIndex);
+			chapter1 = Integer.parseInt(ref.substring(spaceIndex+1, colon1Index));
+			if(dashIndex > 0){  //multiverse
+				verse1 = Integer.parseInt(ref.substring(colon1Index+1, dashIndex));
+				if(colon2Index > 0){  //multichapter
+					chapter2 = Integer.parseInt(ref.substring(dashIndex+1, colon2Index));
+					verse2 = Integer.parseInt(ref.substring(colon2Index+1));
+				}
+				else{
+					chapter2 = chapter1;
+					verse2 = Integer.parseInt(ref.substring(dashIndex+1));
+				}
+			}
+			else{
+				verse1 = Integer.parseInt(ref.substring(colon1Index+1));
+				chapter2 = chapter1;
+				verse2 = verse1;
+			}
+		}
+		
+		public boolean isFirstVerseOf(Reference ref){
+			if(book.equals(ref.book) &&
+					chapter1 == ref.chapter1 &&
+					verse1 == ref.verse1)
+				return true;
+			return false;
+		}
+		
+		public boolean isLastVerseOf(Reference ref){
+			if(book.equals(ref.book) &&
+					chapter1 == ref.chapter2 &&
+					verse1 == ref.verse2)
+				return true;
+			return false;
+		}
+		
+		public Reference nextVerse(DbHelper dbhelper){
+			Reference nextRef = new Reference();
+			nextRef.book = book;
+			int lastVerse = dbhelper.getNumberOfVerses(book, chapter2);
+			if(verse2 == lastVerse){
+				int lastChapter = dbhelper.getNumberOfChapters(book);
+				if(lastChapter == chapter2)
+					return null;
+				nextRef.chapter1 = chapter2 + 1;
+				nextRef.verse1 = 1;
+			}
+			else{
+				nextRef.chapter1 = chapter2;
+				nextRef.verse1 = verse2 + 1;
+			}
+			return nextRef;
+		}
+		
+		public Reference previousVerse(DbHelper dbhelper){
+			if(chapter1 == 1 && verse1 == 1)
+				return null;
+			Reference previousRef = new Reference();
+			previousRef.book = book;
+			if(verse1 == 1){
+				previousRef.chapter1 = chapter1 - 1;
+				previousRef.verse1 = dbhelper.getNumberOfVerses(book, chapter1-1);
+			}
+			else{
+				previousRef.chapter1 = chapter1;
+				previousRef.verse1 = verse1 - 1;
+			}
+			return previousRef;
+		}
+	}
 	
 	public Verse(String new_ref, String new_body){
 		//dbhelper = new_dbhelper;
@@ -122,6 +212,7 @@ public class Verse {
 		return true;
 	}
 	
+	
 	public void delete(DbHelper dbhelper){
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		db.delete(VERSES_TABLE, ID_COLUMN+"="+id, null);
@@ -162,6 +253,30 @@ public class Verse {
 	
 	public String getLastAttemptString(){
 		return lastAttempt.getYear() + "-" + lastAttempt.getMonthOfYear() + "-" + lastAttempt.getDayOfMonth();
+	}
+	
+	
+	public int[] getMergeVerses(DbHelper dbhelper){
+		if(mergeVerses != null)
+			return mergeVerses;
+		mergeVerses = new int[]{-1, -1};
+		Reference myRef = new Reference(reference);
+		Reference previousRef = myRef.previousVerse(dbhelper);
+		Reference nextRef = myRef.nextVerse(dbhelper);
+		Cursor verses = dbhelper.getVersesCursor();
+		verses.moveToFirst();
+		while(!verses.isAfterLast() && 
+				( (previousRef != null && mergeVerses[0]==-1) || (nextRef != null && mergeVerses[1]==-1) ) ){
+			Reference testRef = new Reference(DbHelper.getCursorString(verses, REFERENCE_COLUMN));
+			if(previousRef.isLastVerseOf(testRef)){
+				mergeVerses[0] = DbHelper.getCursorInt(verses, ID_COLUMN);
+			} 
+			else if(nextRef.isFirstVerseOf(testRef)){
+				mergeVerses[1] = DbHelper.getCursorInt(verses, ID_COLUMN);
+			}
+			verses.moveToNext();
+		}
+		return mergeVerses;
 	}
 	
 	public double getProgress(){
@@ -273,7 +388,17 @@ public class Verse {
 		return verseId;
 	}
 
- 	public static LocalDate lastAttemptFromString(String s){
+ 	
+	public boolean isMergeable(DbHelper dbhelper){
+		if(mergeVerses == null)
+			getMergeVerses(dbhelper);
+		if(mergeVerses[0]<0 && mergeVerses[1]<0)
+			return false;
+		return true;
+		
+	}
+	
+	public static LocalDate lastAttemptFromString(String s){
 		String[] params = s.split("-");
 		return new LocalDate(Integer.parseInt(params[0]), Integer.parseInt(params[1]), Integer.parseInt(params[2]));
 	}
