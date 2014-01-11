@@ -19,9 +19,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,8 +27,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CursorAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -255,14 +250,10 @@ public class NewVerseActivity extends Activity implements OnItemSelectedListener
 //	}
 	
 	private void setVerseRef(){
-		verseRef = currentBook.getName() + " " + currentChapter1 + ":" + currentVerse1;
-		if(multiverse){
-			verseRef += "-";
-			if(currentChapter1 != currentChapter2){
-				verseRef += currentChapter2 + ":";
-			}
-			verseRef += currentVerse2;
-		}
+		if(multiverse)
+			verseRef = Reference.makeReferenceString(currentBook.getName(), currentChapter1, currentChapter2, currentVerse1, currentVerse2);
+		else
+			verseRef = Reference.makeReferenceString(currentBook.getName(), currentChapter1, currentVerse1);
 	}
 	
 	private void updateChapter1Spinner(){

@@ -1,15 +1,10 @@
 package org.gospelcoding.versemem;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
-
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -64,96 +59,7 @@ public class Verse {
 	private int streakType;
 	private LocalDate lastAttempt;
 	private float weight;
-	private int[] mergeVerses = null;
-	
-	public class Reference{
-		public String book;
-		public int chapter1;
-		public int chapter2;
-		public int verse1;
-		public int verse2;
-		
-		public Reference(){
-			book = "";
-			chapter1 = chapter2 = verse1 = verse2 = 0;
-		}
-		
-		public Reference(String ref){
-			int spaceIndex = ref.indexOf(' ');
-			int colon1Index = ref.indexOf(':');
-			int dashIndex = ref.indexOf('-');
-			int colon2Index = ref.indexOf(':', colon1Index+1);
-			
-			book = ref.substring(0, spaceIndex);
-			chapter1 = Integer.parseInt(ref.substring(spaceIndex+1, colon1Index));
-			if(dashIndex > 0){  //multiverse
-				verse1 = Integer.parseInt(ref.substring(colon1Index+1, dashIndex));
-				if(colon2Index > 0){  //multichapter
-					chapter2 = Integer.parseInt(ref.substring(dashIndex+1, colon2Index));
-					verse2 = Integer.parseInt(ref.substring(colon2Index+1));
-				}
-				else{
-					chapter2 = chapter1;
-					verse2 = Integer.parseInt(ref.substring(dashIndex+1));
-				}
-			}
-			else{
-				verse1 = Integer.parseInt(ref.substring(colon1Index+1));
-				chapter2 = chapter1;
-				verse2 = verse1;
-			}
-		}
-		
-		public boolean isFirstVerseOf(Reference ref){
-			if(book.equals(ref.book) &&
-					chapter1 == ref.chapter1 &&
-					verse1 == ref.verse1)
-				return true;
-			return false;
-		}
-		
-		public boolean isLastVerseOf(Reference ref){
-			if(book.equals(ref.book) &&
-					chapter1 == ref.chapter2 &&
-					verse1 == ref.verse2)
-				return true;
-			return false;
-		}
-		
-		public Reference nextVerse(DbHelper dbhelper){
-			Reference nextRef = new Reference();
-			nextRef.book = book;
-			int lastVerse = dbhelper.getNumberOfVerses(book, chapter2);
-			if(verse2 == lastVerse){
-				int lastChapter = dbhelper.getNumberOfChapters(book);
-				if(lastChapter == chapter2)
-					return null;
-				nextRef.chapter1 = chapter2 + 1;
-				nextRef.verse1 = 1;
-			}
-			else{
-				nextRef.chapter1 = chapter2;
-				nextRef.verse1 = verse2 + 1;
-			}
-			return nextRef;
-		}
-		
-		public Reference previousVerse(DbHelper dbhelper){
-			if(chapter1 == 1 && verse1 == 1)
-				return null;
-			Reference previousRef = new Reference();
-			previousRef.book = book;
-			if(verse1 == 1){
-				previousRef.chapter1 = chapter1 - 1;
-				previousRef.verse1 = dbhelper.getNumberOfVerses(book, chapter1-1);
-			}
-			else{
-				previousRef.chapter1 = chapter1;
-				previousRef.verse1 = verse1 - 1;
-			}
-			return previousRef;
-		}
-	}
+	private long[] mergeVerses = null;
 	
 	public Verse(String new_ref, String new_body){
 		//dbhelper = new_dbhelper;
@@ -256,26 +162,31 @@ public class Verse {
 	}
 	
 	
-	public int[] getMergeVerses(DbHelper dbhelper){
+	public long[] getMergeVerses(DbHelper dbhelper){
 		if(mergeVerses != null)
 			return mergeVerses;
-		mergeVerses = new int[]{-1, -1};
+		mergeVerses = new long[]{-1, -1};
+		if(status != STATUS_MASTERED)
+			return mergeVerses;
 		Reference myRef = new Reference(reference);
 		Reference previousRef = myRef.previousVerse(dbhelper);
 		Reference nextRef = myRef.nextVerse(dbhelper);
-		Cursor verses = dbhelper.getVersesCursor();
+		SQLiteDatabase db = dbhelper.getReadableDatabase();
+		Cursor verses = db.query(Verse.VERSES_TABLE, null, STATUS_COLUMN+"="+STATUS_MASTERED, null, null, null, null);
 		verses.moveToFirst();
 		while(!verses.isAfterLast() && 
 				( (previousRef != null && mergeVerses[0]==-1) || (nextRef != null && mergeVerses[1]==-1) ) ){
 			Reference testRef = new Reference(DbHelper.getCursorString(verses, REFERENCE_COLUMN));
 			if(previousRef.isLastVerseOf(testRef)){
-				mergeVerses[0] = DbHelper.getCursorInt(verses, ID_COLUMN);
+				mergeVerses[0] = DbHelper.getCursorLong(verses, ID_COLUMN);
 			} 
 			else if(nextRef.isFirstVerseOf(testRef)){
-				mergeVerses[1] = DbHelper.getCursorInt(verses, ID_COLUMN);
+				mergeVerses[1] = DbHelper.getCursorLong(verses, ID_COLUMN);
 			}
 			verses.moveToNext();
 		}
+		verses.close();
+		db.close();
 		return mergeVerses;
 	}
 	
@@ -377,7 +288,8 @@ public class Verse {
 	
 	public int getStreakType(){ return streakType; }
 	
-	public float getWeight(){ return weight; }
+	public float getWeight(){ return weight; }	
+
 	
 	public long insertVerse(DbHelper dbhelper){
 		ContentValues values = getInsertValues();
@@ -417,14 +329,37 @@ public class Verse {
 		return values;
 	}
 	
+	
+	public void mergeWith(long verseId, DbHelper dbhelper){
+		Verse mergeVerse = getVerse(dbhelper, verseId);
+		getMergeVerses(dbhelper);
+		if(verseId == mergeVerses[0]){
+			body = mergeVerse.getBody() + body;
+			reference = Reference.mergeRefs(mergeVerse.getReference(), reference);
+		}
+		else if(verseId == mergeVerses[1]){
+			body = body + mergeVerse.getBody();
+			reference = Reference.mergeRefs(reference, mergeVerse.getReference());
+		}
+		else{
+			return;
+		}
+		streak = attempts = right = 0;
+		saveVerse(dbhelper);
+		mergeVerse.delete(dbhelper);
+		weighterMax(dbhelper);
+	}
+	
 	public static String printableBody(String s){
 		return s.replaceAll("<.*?>", "");
 	}
+	
 	
 	public static int saveQuizResult(DbHelper dbhelper, long verseId, boolean success){
 		Verse v = getVerse(dbhelper, verseId);
 		return v.saveQuizResult(success, dbhelper);
 	}
+	
 	
 	public int saveQuizResult(boolean success, DbHelper dbhelper){
 		++attempts;
@@ -468,12 +403,16 @@ public class Verse {
 				status = STATUS_REFRESHING;
 			}
 		}
+		saveVerse(dbhelper);
+		Verse.weighterMax(dbhelper);
+		return streak;
+	}
+	
+	public void saveVerse(DbHelper dbhelper){
 		ContentValues values = makeContentValues();
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		db.update(VERSES_TABLE, values, getIdWhereClause(id), null);
 		db.close();
-		Verse.weighterMax(dbhelper);
-		return streak;
 	}
 	
 	public static void setBlitzWeights(long blitzId, DbHelper dbhelper){
@@ -552,7 +491,6 @@ public class Verse {
 		vCursor.close();
 		db.close();
 	}
-	
 	
 	//Will be used by ArrayAdapter in ListView
 	@Override

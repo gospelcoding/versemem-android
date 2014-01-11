@@ -5,12 +5,9 @@ import java.util.List;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class DbHelper extends SQLiteAssetHelper {
 	public static final int DATABASE_VERSION = 3;
@@ -136,6 +133,7 @@ public class DbHelper extends SQLiteAssetHelper {
 		return attemptId;
 	}
 	
+	//TODO delete this method and rewrite as necessary
 	public Cursor getVersesCursor(){
 		SQLiteDatabase db = getReadableDatabase();
 		return db.query(Verse.VERSES_TABLE, null, null, null, null, null, Verse.ID_COLUMN, null);
