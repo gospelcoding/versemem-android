@@ -118,14 +118,13 @@ public class Verse {
 		return true;
 	}
 	
-	
 	public void delete(DbHelper dbhelper){
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		db.delete(VERSES_TABLE, ID_COLUMN+"="+id, null);
 		db.close();
 	}
 	
-	/* Does not work with merged verses! */
+	/* Does not work with multiverse verses! */
 	public void editBody(String newBody, DbHelper dbhelper){
 		newBody = newBody.replaceAll("[<>]", "");
 		String tag = body.substring(0, body.indexOf('>')+1);
@@ -161,7 +160,6 @@ public class Verse {
 		return lastAttempt.getYear() + "-" + lastAttempt.getMonthOfYear() + "-" + lastAttempt.getDayOfMonth();
 	}
 	
-	
 	public long[] getMergeVerses(DbHelper dbhelper){
 		if(mergeVerses != null)
 			return mergeVerses;
@@ -177,10 +175,10 @@ public class Verse {
 		while(!verses.isAfterLast() && 
 				( (previousRef != null && mergeVerses[0]==-1) || (nextRef != null && mergeVerses[1]==-1) ) ){
 			Reference testRef = new Reference(DbHelper.getCursorString(verses, REFERENCE_COLUMN));
-			if(previousRef.isLastVerseOf(testRef)){
+			if(previousRef!=null && previousRef.isLastVerseOf(testRef)){
 				mergeVerses[0] = DbHelper.getCursorLong(verses, ID_COLUMN);
 			} 
-			else if(nextRef.isFirstVerseOf(testRef)){
+			else if(nextRef!=null && nextRef.isFirstVerseOf(testRef)){
 				mergeVerses[1] = DbHelper.getCursorLong(verses, ID_COLUMN);
 			}
 			verses.moveToNext();
@@ -290,7 +288,6 @@ public class Verse {
 	
 	public float getWeight(){ return weight; }	
 
-	
 	public long insertVerse(DbHelper dbhelper){
 		ContentValues values = getInsertValues();
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
@@ -300,7 +297,6 @@ public class Verse {
 		return verseId;
 	}
 
- 	
 	public boolean isMergeable(DbHelper dbhelper){
 		if(mergeVerses == null)
 			getMergeVerses(dbhelper);
@@ -329,7 +325,6 @@ public class Verse {
 		return values;
 	}
 	
-	
 	public void mergeWith(long verseId, DbHelper dbhelper){
 		Verse mergeVerse = getVerse(dbhelper, verseId);
 		getMergeVerses(dbhelper);
@@ -354,12 +349,10 @@ public class Verse {
 		return s.replaceAll("<.*?>", "");
 	}
 	
-	
 	public static int saveQuizResult(DbHelper dbhelper, long verseId, boolean success){
 		Verse v = getVerse(dbhelper, verseId);
 		return v.saveQuizResult(success, dbhelper);
 	}
-	
 	
 	public int saveQuizResult(boolean success, DbHelper dbhelper){
 		++attempts;

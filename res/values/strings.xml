@@ -4,6 +4,7 @@
     <string name="app_name">Verse Mem</string>
     <string name="edit_verse_button">Edit</string>
     <string name="delete">Delete</string>
+    <string name="merge">Merge</string>
     <string name="save_button">Save</string>
     <string name="cancel">Cancel</string>
     <string name="delete_dialog">Delete Verse?</string>

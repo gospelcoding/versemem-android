@@ -72,5 +72,15 @@
 	        android:text="@string/delete"
 	        android:onClick="deleteVerseButton" />
 	    
+	    <Button
+	        android:id="@+id/button_merge_verse"
+	        android:layout_height="wrap_content"
+	        android:layout_width="0dp"
+	        android:layout_weight="1"
+	        android:text="@string/merge"
+	        android:onClick="mergeDialog"
+	        android:visibility="invisible" />
+	       
+	       
 	</LinearLayout>
 </LinearLayout>

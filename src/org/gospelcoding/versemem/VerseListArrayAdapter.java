@@ -2,6 +2,7 @@ package org.gospelcoding.versemem;
 
 import java.util.List;
 
+import android.app.ActionBar.LayoutParams;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 public class VerseListArrayAdapter extends ArrayAdapter<Verse> {
@@ -96,6 +98,11 @@ public class VerseListArrayAdapter extends ArrayAdapter<Verse> {
 		rowView = fillOutNormalPart(rowView, v, parent);
 		TextView verseBody = (TextView) rowView.findViewById(R.id.text_verse_body);
 		verseBody.setText(v.getBody());
+		if(v.isMergeable(new DbHelper(context))){
+			View mergeButton = rowView.findViewById(R.id.button_merge_verse);
+			mergeButton.setVisibility(View.VISIBLE);
+			//mergeButton.setLayoutParams(new TableLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+		}
 		return rowView;
 	}
 	
